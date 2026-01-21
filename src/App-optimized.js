@@ -14,6 +14,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import {
   collection,
   addDoc,
@@ -29,6 +30,20 @@ import {
   validateRequired,
   sanitizeNumber,
 } from "./utils/validation";
+
+// Список співробітників
+const EMPLOYEES = [
+  "Заброварна Т.М.",
+  "Герега С.Р.",
+  "Гудловська М.А.",
+  "Кожемяченко В.С.",
+  "Коротіна Х.В.",
+  "Левків В.А.",
+  "Линда Б.Л.",
+  "Раба Б.М.",
+  "Семенюк О.О.",
+  "Чорній Д.І.",
+];
 
 // Встановлюю root для accessibility
 Modal.setAppElement("#root");
@@ -49,9 +64,10 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [editingDayId, setEditingDayId] = useState(null);
 
   // Завантаження даних
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (silent = false) => {
     if (!db) {
       const errorMsg = MESSAGES.ERRORS.FIREBASE_NOT_INITIALIZED;
       console.error(errorMsg);
@@ -67,7 +83,9 @@ function App() {
     }
 
     try {
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setError(null);
 
       // Завантажити початковий баланс
@@ -101,15 +119,22 @@ function App() {
           };
         });
 
-        // Сортуємо на клієнті
-        daysData.sort((a, b) => b.date - a.date);
+        // Сортуємо за датою: найновіші зверху
+        daysData.sort((a, b) => {
+          const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+          const dateB = b.date instanceof Date ? b.date : new Date(b.date);
+          return dateB.getTime() - dateA.getTime();
+        });
+
         setDays(daysData);
       } catch (daysError) {
         console.warn("Дні не знайдено:", daysError.message);
         setDays([]);
       }
 
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Критична помилка завантаження даних:", error);
       setError(error.message);
@@ -253,26 +278,39 @@ function App() {
 
     try {
       const dateObj = new Date(newDate);
-      await addDoc(collection(db, COLLECTIONS.DAYS), {
-        date: Timestamp.fromDate(dateObj),
-        entries: currentEntries,
-        personnel: personnel,
-        createdAt: Timestamp.now(),
-      });
+
+      if (editingDayId) {
+        // Режим редагування - оновлюємо існуючий запис
+        await updateDoc(doc(db, COLLECTIONS.DAYS, editingDayId), {
+          date: Timestamp.fromDate(dateObj),
+          entries: currentEntries,
+          personnel: personnel,
+          updatedAt: Timestamp.now(),
+        });
+      } else {
+        // Режим додавання - створюємо новий запис
+        await addDoc(collection(db, COLLECTIONS.DAYS), {
+          date: Timestamp.fromDate(dateObj),
+          entries: currentEntries,
+          personnel: personnel,
+          createdAt: Timestamp.now(),
+        });
+      }
 
       // Очистити форму
       setNewDate("");
       setNewPersonnel("");
       setCurrentEntries([]);
+      setEditingDayId(null);
       setShowModal(false);
 
-      // Перезавантажити дані
-      await loadData();
+      // Перезавантажити дані (без показу екрана завантаження)
+      await loadData(true);
 
       Swal.fire({
         icon: "success",
         title: "Успіх!",
-        text: MESSAGES.SUCCESS.DAY_SAVED,
+        text: editingDayId ? "День оновлено!" : MESSAGES.SUCCESS.DAY_SAVED,
         timer: SWAL_CONFIG.timer,
         showConfirmButton: false,
       });
@@ -285,9 +323,32 @@ function App() {
         confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
       });
     }
-  }, [newDate, currentEntries, newPersonnel, loadData]);
+  }, [newDate, currentEntries, newPersonnel, editingDayId, loadData]);
 
-  const handleOpenModal = useCallback(() => {
+  const handleOpenModal = useCallback((day = null) => {
+    if (day) {
+      // Режим редагування
+      setEditingDayId(day.id);
+      try {
+        const date = day.date instanceof Date ? day.date : new Date(day.date);
+        if (!isNaN(date.getTime())) {
+          setNewDate(date.toISOString().split("T")[0]);
+        } else {
+          setNewDate("");
+        }
+      } catch (error) {
+        console.error("Помилка конвертації дати:", error);
+        setNewDate("");
+      }
+      setCurrentEntries(day.entries || []);
+      setNewPersonnel(day.personnel?.toString() || "");
+    } else {
+      // Режим додавання
+      setEditingDayId(null);
+      setNewDate("");
+      setCurrentEntries([]);
+      setNewPersonnel("");
+    }
     setShowModal(true);
   }, []);
 
@@ -299,6 +360,7 @@ function App() {
     setNewAmount("");
     setNewPersonnel("");
     setCurrentEntries([]);
+    setEditingDayId(null);
   }, []);
 
   const handleDeleteDay = useCallback(
@@ -317,7 +379,7 @@ function App() {
       if (result.isConfirmed) {
         try {
           await deleteDoc(doc(db, COLLECTIONS.DAYS, dayId));
-          await loadData();
+          await loadData(true);
 
           Swal.fire({
             icon: "success",
@@ -340,10 +402,19 @@ function App() {
     [loadData],
   );
 
+  // Відсортовані дні (найсвіжіші зверху)
+  const sortedDays = useMemo(() => {
+    return [...days].sort((a, b) => {
+      const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+      const dateB = b.date instanceof Date ? b.date : new Date(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, [days]);
+
   // Обчислення балансу
   const currentBalance = useMemo(() => {
     let balance = initialBalance;
-    days.forEach((day) => {
+    sortedDays.forEach((day) => {
       const dayTotal = day.entries.reduce(
         (sum, entry) => sum + (entry.amount || 0),
         0,
@@ -351,7 +422,7 @@ function App() {
       balance += dayTotal - (day.personnel || 0);
     });
     return balance;
-  }, [initialBalance, days]);
+  }, [initialBalance, sortedDays]);
 
   // Форматування
   const formatDate = useCallback((date) => {
@@ -551,14 +622,19 @@ function App() {
           <div className="entry-form">
             <div className="form-group">
               <label htmlFor="person-name">ПІБ</label>
-              <input
+              <select
                 id="person-name"
-                type="text"
                 value={newPersonName}
                 onChange={(e) => setNewPersonName(e.target.value)}
-                placeholder="Введіть ПІБ"
                 aria-label="ПІБ особи"
-              />
+              >
+                <option value="">Оберіть співробітника</option>
+                {EMPLOYEES.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="form-group">
               <label htmlFor="amount-input">Сума</label>
@@ -660,7 +736,7 @@ function App() {
                 }}
               >
                 <SaveIcon style={{ fontSize: "1.1em" }} />
-                Зберегти день
+                {editingDayId ? "Оновити день" : "Зберегти день"}
               </button>
             </div>
           )}
@@ -673,13 +749,13 @@ function App() {
           <EventIcon style={{ fontSize: "1em" }} />
           Записи по днях
         </h3>
-        {days.length === 0 ? (
+        {sortedDays.length === 0 ? (
           <div className="empty-state">
             <p>Поки немає жодних записів. Додайте перший день!</p>
           </div>
         ) : (
           <div className="days-grid">
-            {days.map((day) => {
+            {sortedDays.map((day) => {
               const dayTotal = day.entries.reduce(
                 (sum, entry) => sum + (entry.amount || 0),
                 0,
@@ -692,14 +768,24 @@ function App() {
                       <EventIcon style={{ fontSize: "1.1em" }} />
                       {formatDate(day.date)}
                     </div>
-                    <button
-                      className="btn-delete-compact"
-                      onClick={() => handleDeleteDay(day.id)}
-                      aria-label={`Видалити день ${formatDate(day.date)}`}
-                      title="Видалити"
-                    >
-                      <DeleteOutlineIcon style={{ fontSize: "1.1em" }} />
-                    </button>
+                    <div className="day-card-actions">
+                      <button
+                        className="btn-edit-compact"
+                        onClick={() => handleOpenModal(day)}
+                        aria-label={`Редагувати день ${formatDate(day.date)}`}
+                        title="Редагувати"
+                      >
+                        <EditNoteIcon style={{ fontSize: "1.1em" }} />
+                      </button>
+                      <button
+                        className="btn-delete-compact"
+                        onClick={() => handleDeleteDay(day.id)}
+                        aria-label={`Видалити день ${formatDate(day.date)}`}
+                        title="Видалити"
+                      >
+                        <DeleteOutlineIcon style={{ fontSize: "1.1em" }} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="day-card-body">

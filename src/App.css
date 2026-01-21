@@ -412,7 +412,9 @@ h1 {
   letter-spacing: 0.01em;
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
+  width: 100%;
   padding: 14px 16px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;
@@ -420,17 +422,31 @@ h1 {
   background: white;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   font-weight: 500;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
-.form-group input:hover {
+.form-group select {
+  cursor: pointer;
+  padding-right: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236366f1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+}
+
+.form-group input:hover,
+.form-group select:hover {
   border-color: #cbd5e1;
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
-  background: #fefefe;
+  background-color: #fefefe;
 }
 
 .entries-list {
@@ -541,21 +557,66 @@ h1 {
   font-size: 1.1em;
 }
 
+.day-card-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn-edit-compact {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.7;
+  color: #6366f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.btn-edit-compact:hover {
+  background: rgba(99, 102, 241, 0.15);
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.btn-edit-compact:active {
+  transform: translateY(0);
+}
+
 .btn-delete-compact {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 1.1em;
-  transition: all 0.2s ease;
-  opacity: 0.6;
+  padding: 6px;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.7;
+  color: #ef4444;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
 }
 
 .btn-delete-compact:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.15);
   opacity: 1;
-  transform: scale(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2);
+}
+
+.btn-delete-compact:active {
+  transform: translateY(0);
 }
 
 .day-card-body {
@@ -785,12 +846,12 @@ h1 {
   }
 
   .app-container {
-    padding: 24px;
-    border-radius: 20px;
+    padding: 20px;
+    border-radius: 16px;
   }
 
   .app-header {
-    padding: 24px;
+    padding: 20px;
     border-radius: 16px;
   }
 
@@ -803,6 +864,7 @@ h1 {
   .header-icon {
     width: 56px;
     height: 56px;
+    margin: 0 auto;
   }
 
   .header-icon svg {
@@ -819,49 +881,197 @@ h1 {
 
   .balance-cards {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .balance-card {
+    padding: 16px;
+  }
+
+  .balance-card-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .balance-card-icon svg {
+    font-size: 1.2em;
+  }
+
+  .balance-card-title {
+    font-size: 0.8em;
   }
 
   .balance-card-amount {
-    font-size: 1.8em;
+    font-size: 1.6em;
+  }
+
+  .balance-currency {
+    font-size: 0.45em;
+  }
+
+  .balance-card-trend {
+    font-size: 0.8em;
+  }
+
+  .add-day-button {
+    padding: 12px 24px;
+    font-size: 0.95em;
+    width: 100%;
+    justify-content: center;
   }
 
   .add-entry-section {
-    padding: 24px;
+    padding: 20px;
   }
 
   .entry-form {
     grid-template-columns: 1fr;
   }
 
-  .day-card {
-    padding: 20px;
+  .days-section h3 {
+    font-size: 1.2em;
   }
 
-  .day-date {
-    font-size: 1.3em;
-  }
-
-  .day-header {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .balance-cards {
+  .days-grid {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
 
-  .balance-card-amount {
-    font-size: 1.8em;
+  .day-card-header {
+    padding: 10px 14px;
+  }
+
+  .day-card-body {
+    padding: 10px 14px;
+  }
+
+  .day-card-footer {
+    padding: 10px 14px;
+  }
+
+  .day-date-compact {
+    font-size: 0.9em;
+  }
+
+  .entry-name-compact {
+    font-size: 0.85em;
+  }
+
+  .entry-amount-compact {
+    font-size: 0.9em;
+  }
+
+  .personnel-label-compact {
+    font-size: 0.8em;
+  }
+
+  .personnel-amount-compact {
+    font-size: 0.9em;
+  }
+
+  .footer-label {
+    font-size: 0.75em;
+  }
+
+  .footer-total {
+    font-size: 1em;
   }
 
   .btn {
-    width: 100%;
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+
+  .btn-sm {
+    padding: 6px 10px;
+  }
+
+  .form-group label {
+    font-size: 0.85em;
+  }
+
+  .form-group input {
+    padding: 12px 14px;
+    font-size: 0.95em;
+  }
+
+  .modal-content {
+    padding: 24px;
+    max-height: 85vh;
+    border-radius: 16px;
+  }
+
+  .modal-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .modal-header h3 {
+    font-size: 1.2em;
+  }
+
+  .modal-close {
+    width: 32px;
+    height: 32px;
   }
 
   .swal2-popup {
     width: 90% !important;
     padding: 24px !important;
+  }
+}
+
+/* Додаткові медіа-запити для малих екранів */
+@media (max-width: 480px) {
+  body {
+    padding: 8px;
+  }
+
+  .app-container {
+    padding: 16px;
+  }
+
+  .app-header {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 1.4em;
+  }
+
+  .header-subtitle {
+    font-size: 0.8em;
+  }
+
+  .header-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .balance-card {
+    padding: 14px;
+  }
+
+  .balance-card-amount {
+    font-size: 1.4em;
+  }
+
+  .add-day-button {
+    padding: 10px 20px;
+    font-size: 0.9em;
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .entry-form {
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 0.85em;
   }
 }
 
@@ -992,37 +1202,23 @@ h1 {
   transform: translateY(0);
 }
 
-@media (max-width: 768px) {
-  .modal-content {
-    padding: 24px;
-    max-height: 85vh;
+/* Responsive для планшетів */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app-container {
+    padding: 28px;
   }
 
-  .modal-header h3 {
-    font-size: 1.3em;
+  .app-header {
+    padding: 28px;
+  }
+
+  .balance-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 
   .days-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .day-card-header {
-    padding: 10px 14px;
-  }
-
-  .day-card-body {
-    padding: 10px 14px;
-  }
-
-  .day-card-footer {
-    padding: 10px 14px;
-  }
-
-  .entry-name-compact {
-    font-size: 0.85em;
-  }
-
-  .entry-amount-compact {
-    font-size: 0.9em;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
   }
 }

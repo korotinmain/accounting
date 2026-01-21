@@ -23,5 +23,22 @@ yarn-error.log*
 
 # Firebase
 .firebase
-.firebaserc
 firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.cache
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
