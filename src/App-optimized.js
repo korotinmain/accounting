@@ -624,6 +624,7 @@ function App() {
                 title="Редагувати"
               >
                 <EditIcon style={{ fontSize: "1em" }} />
+                <span className="btn-text-mobile">Ред.</span>
               </button>
             )}
           </div>
@@ -651,15 +652,7 @@ function App() {
                   onClick={handleSaveBalance}
                 >
                   <SaveIcon style={{ fontSize: "1em" }} />
-                </button>
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => {
-                    setEditingBalance(false);
-                    setBalanceInput("");
-                  }}
-                >
-                  <CloseIcon style={{ fontSize: "1em" }} />
+                  <span>Зберегти</span>
                 </button>
               </div>
             </div>
@@ -914,6 +907,7 @@ function App() {
                         title="Редагувати"
                       >
                         <EditNoteIcon style={{ fontSize: "1.1em" }} />
+                        <span className="btn-text-mobile">Ред.</span>
                       </button>
                       <button
                         className="btn-delete-compact"
@@ -922,6 +916,7 @@ function App() {
                         title="Видалити"
                       >
                         <DeleteOutlineIcon style={{ fontSize: "1.1em" }} />
+                        <span className="btn-text-mobile">Вид.</span>
                       </button>
                     </div>
                   </div>

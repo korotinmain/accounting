@@ -410,12 +410,12 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
 }
 
 .btn-edit-balance:hover {
   background: #f1f5f9;
   color: #6366f1;
-  transform: rotate(15deg);
 }
 
 .balance-card-amount {
@@ -458,7 +458,7 @@ h1 {
 .balance-edit-inline {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .balance-edit-inline input {
@@ -469,6 +469,7 @@ h1 {
   font-weight: 600;
   background: white;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .balance-edit-inline input:focus {
@@ -477,9 +478,38 @@ h1 {
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
+.balance-edit-inline .btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  box-shadow:
+    0 2px 8px rgba(99, 102, 241, 0.3),
+    0 0 0 1px rgba(99, 102, 241, 0.1) inset;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+}
+
+.balance-edit-inline .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(99, 102, 241, 0.4),
+    0 0 0 1px rgba(99, 102, 241, 0.2) inset;
+}
+
+.balance-edit-inline .btn-primary:active {
+  transform: translateY(0);
+  box-shadow:
+    0 2px 6px rgba(99, 102, 241, 0.3),
+    0 0 0 1px rgba(99, 102, 241, 0.15) inset;
+}
+
 .balance-edit-actions {
   display: flex;
   gap: 8px;
+  justify-content: center;
 }
 
 .btn-sm {
@@ -770,8 +800,13 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   width: 32px;
   height: 32px;
+}
+
+.btn-text-mobile {
+  display: none;
 }
 
 .btn-edit-compact:hover {
@@ -798,6 +833,7 @@ h1 {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 4px;
   width: 32px;
   height: 32px;
 }
@@ -1114,6 +1150,57 @@ h1 {
     justify-content: center;
   }
 
+  .add-day-button svg {
+    font-size: 1.3em !important;
+  }
+
+  .btn-edit-balance {
+    padding: 8px;
+  }
+
+  .btn-edit-balance svg {
+    font-size: 1.2em !important;
+  }
+
+  .btn-edit-balance .btn-text-mobile {
+    display: inline;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+
+  .btn-edit-balance {
+    padding: 8px 12px;
+  }
+
+  .balance-edit-actions .btn-sm svg {
+    font-size: 1.3em !important;
+  }
+
+  .balance-edit-actions .btn-sm .btn-text-mobile {
+    display: inline;
+    font-size: 0.7em;
+    font-weight: 600;
+  }
+
+  .balance-edit-actions .btn-sm {
+    padding: 8px 14px;
+  }
+
+  .tabs-container {
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .tab-button {
+    padding: 12px 16px;
+    font-size: 0.9em;
+  }
+
+  .tab-button svg {
+    font-size: 1.3em !important;
+    margin-right: 6px !important;
+  }
+
   .add-entry-section {
     padding: 20px;
   }
@@ -1169,6 +1256,34 @@ h1 {
 
   .footer-total {
     font-size: 1em;
+  }
+
+  .btn-edit-compact,
+  .btn-delete-compact {
+    width: 36px;
+    height: 36px;
+    padding: 8px;
+  }
+
+  .btn-edit-compact svg,
+  .btn-delete-compact svg {
+    font-size: 1.2em !important;
+  }
+
+  .btn-text-mobile {
+    display: inline;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+
+  .btn-edit-compact,
+  .btn-delete-compact {
+    width: auto;
+    padding: 8px 12px;
+  }
+
+  .day-date-compact svg {
+    font-size: 1.2em !important;
   }
 
   .btn {
@@ -1242,6 +1357,10 @@ h1 {
     height: 48px;
   }
 
+  .header-icon svg {
+    font-size: 1.6em !important;
+  }
+
   .balance-card {
     padding: 14px;
   }
@@ -1253,6 +1372,70 @@ h1 {
   .add-day-button {
     padding: 10px 20px;
     font-size: 0.9em;
+  }
+
+  .add-day-button svg {
+    font-size: 1.4em !important;
+  }
+
+  .btn-edit-balance svg {
+    font-size: 1.3em !important;
+  }
+
+  .btn-edit-balance .btn-text-mobile {
+    display: inline;
+    font-size: 0.7em;
+    font-weight: 600;
+  }
+
+  .btn-edit-balance {
+    padding: 10px 14px;
+  }
+
+  .balance-edit-actions .btn-sm svg {
+    font-size: 1.4em !important;
+  }
+
+  .balance-edit-actions .btn-sm .btn-text-mobile {
+    display: inline;
+    font-size: 0.65em;
+    font-weight: 600;
+  }
+
+  .balance-edit-actions .btn-sm {
+    padding: 10px 16px;
+  }
+
+  .tab-button svg {
+    font-size: 1.4em !important;
+  }
+
+  .btn-edit-compact,
+  .btn-delete-compact {
+    width: 40px;
+    height: 40px;
+    padding: 10px;
+  }
+
+  .btn-edit-compact svg,
+  .btn-delete-compact svg {
+    font-size: 1.3em !important;
+  }
+
+  .btn-text-mobile {
+    display: inline;
+    font-size: 0.7em;
+    font-weight: 600;
+  }
+
+  .btn-edit-compact,
+  .btn-delete-compact {
+    width: auto;
+    padding: 10px 14px;
+  }
+
+  .day-date-compact svg {
+    font-size: 1.3em !important;
   }
 
   .modal-content {
