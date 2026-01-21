@@ -17,15 +17,15 @@ body {
 }
 
 .app-container {
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
-  border-radius: 24px;
+  border-radius: 20px;
   box-shadow:
-    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 20px 40px -12px rgba(0, 0, 0, 0.25),
     0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-  padding: 48px;
+  padding: 32px;
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -43,8 +43,8 @@ body {
 h1 {
   color: #1e293b;
   text-align: center;
-  margin-bottom: 40px;
-  font-size: 2.75em;
+  margin-bottom: 24px;
+  font-size: 2em;
   font-weight: 800;
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
@@ -57,12 +57,12 @@ h1 {
 .balance-section {
   background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
   color: white;
-  padding: 36px;
-  border-radius: 20px;
-  margin-bottom: 32px;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 24px;
   box-shadow:
-    0 20px 25px -5px rgba(99, 102, 241, 0.3),
-    0 10px 10px -5px rgba(99, 102, 241, 0.04);
+    0 10px 20px -5px rgba(99, 102, 241, 0.3),
+    0 5px 10px -5px rgba(99, 102, 241, 0.04);
   position: relative;
   overflow: hidden;
 }
@@ -93,9 +93,9 @@ h1 {
 }
 
 .balance-value {
-  font-size: 3em;
+  font-size: 2.2em;
   font-weight: 800;
-  margin: 16px 0;
+  margin: 12px 0;
   letter-spacing: -0.02em;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -320,81 +320,172 @@ h1 {
 }
 
 .days-section {
-  margin-top: 32px;
+  margin-top: 24px;
 }
 
 .days-section h3 {
   color: #1e293b;
-  margin-bottom: 24px;
-  font-size: 1.5em;
+  margin-bottom: 20px;
+  font-size: 1.3em;
   font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.day-card {
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.day-card-compact {
   background: white;
-  border-radius: 20px;
-  padding: 28px;
-  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
   box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.08),
     0 0 0 1px rgba(0, 0, 0, 0.02);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid transparent;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid #f1f5f9;
 }
 
-.day-card:hover {
-  transform: translateY(-4px);
+.day-card-compact:hover {
+  transform: translateY(-2px);
   box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  border-color: #e2e8f0;
+    0 8px 16px -4px rgba(99, 102, 241, 0.15),
+    0 0 0 1px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
-.day-header {
+.day-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid #f1f5f9;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.day-date {
-  font-size: 1.6em;
-  font-weight: 800;
-  color: #6366f1;
-  letter-spacing: -0.02em;
-}
-
-.day-total {
-  font-size: 1.4em;
+.day-date-compact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95em;
   font-weight: 700;
-  color: #10b981;
+  color: #1e293b;
+}
+
+.date-icon {
+  font-size: 1.1em;
+}
+
+.btn-delete-compact {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 1.1em;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.btn-delete-compact:hover {
+  background: rgba(239, 68, 68, 0.1);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.day-card-body {
+  padding: 12px 16px;
+}
+
+.entries-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.entry-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.entry-row:last-child {
+  border-bottom: none;
+}
+
+.entry-name-compact {
+  font-size: 0.9em;
+  color: #475569;
+  font-weight: 500;
+}
+
+.entry-amount-compact {
+  font-size: 0.95em;
+  font-weight: 700;
   letter-spacing: -0.01em;
 }
 
-.personnel-section {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  padding: 20px;
-  border-radius: 14px;
-  margin-top: 16px;
-  border: 2px solid #fbbf24;
-  box-shadow: 0 1px 3px 0 rgba(251, 191, 36, 0.1);
+.entry-amount-compact.positive {
+  color: #10b981;
 }
 
-.personnel-label {
+.personnel-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 8px;
+  border: 1px solid #fbbf24;
+}
+
+.personnel-label-compact {
+  font-size: 0.85em;
   font-weight: 600;
   color: #92400e;
-  margin-bottom: 8px;
-  font-size: 0.9em;
 }
 
-.personnel-value {
-  font-size: 1.4em;
+.personnel-amount-compact {
+  font-size: 0.95em;
   font-weight: 700;
   color: #dc2626;
   letter-spacing: -0.01em;
+}
+
+.day-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer-label {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-total {
+  font-size: 1.1em;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.footer-total.positive {
+  color: #10b981;
+}
+
+.footer-total.negative {
+  color: #ef4444;
 }
 
 .personnel-edit {
@@ -581,5 +672,163 @@ h1 {
   .swal2-popup {
     width: 90% !important;
     padding: 24px !important;
+  }
+}
+
+/* Модальне вікно (react-modal) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}
+
+.modal-overlay.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.modal-overlay.ReactModal__Overlay--before-close {
+  opacity: 0;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+  position: relative;
+  margin: auto;
+  transform: translateY(40px) scale(0.95);
+  opacity: 0;
+  transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-content.ReactModal__Content--after-open {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+.modal-content.ReactModal__Content--before-close {
+  transform: translateY(40px) scale(0.95);
+  opacity: 0;
+}
+
+.modal-content:focus {
+  outline: none;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.modal-header h3 {
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.8em;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.modal-body {
+  /* Контент модального вікна */
+}
+
+.add-day-button {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto 24px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.add-day-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.add-day-button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 24px;
+    max-height: 85vh;
+  }
+
+  .modal-header h3 {
+    font-size: 1.3em;
+  }
+
+  .days-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .day-card-header {
+    padding: 10px 14px;
+  }
+
+  .day-card-body {
+    padding: 10px 14px;
+  }
+
+  .day-card-footer {
+    padding: 10px 14px;
+  }
+
+  .entry-name-compact {
+    font-size: 0.85em;
+  }
+
+  .entry-amount-compact {
+    font-size: 0.9em;
   }
 }

@@ -2,6 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import "./App.css";
 import { db } from "./firebase";
 import Swal from "sweetalert2";
+import Modal from "react-modal";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import DescriptionIcon from "@mui/icons-material/Description";
+import WorkIcon from "@mui/icons-material/Work";
+import SaveIcon from "@mui/icons-material/Save";
+import EventIcon from "@mui/icons-material/Event";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   collection,
   addDoc,
@@ -18,6 +27,9 @@ import {
   sanitizeNumber,
 } from "./utils/validation";
 
+// Встановлюю root для accessibility
+Modal.setAppElement("#root");
+
 function App() {
   // State management
   const [initialBalance, setInitialBalance] = useState(0);
@@ -33,6 +45,7 @@ function App() {
   const [days, setDays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   // Завантаження даних
   const loadData = useCallback(async () => {
@@ -248,6 +261,7 @@ function App() {
       setNewDate("");
       setNewPersonnel("");
       setCurrentEntries([]);
+      setShowModal(false);
 
       // Перезавантажити дані
       await loadData();
@@ -269,6 +283,20 @@ function App() {
       });
     }
   }, [newDate, currentEntries, newPersonnel, loadData]);
+
+  const handleOpenModal = useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setShowModal(false);
+    // Очистити форму при закритті
+    setNewDate("");
+    setNewPersonName("");
+    setNewAmount("");
+    setNewPersonnel("");
+    setCurrentEntries([]);
+  }, []);
 
   const handleDeleteDay = useCallback(
     async (dayId) => {
@@ -363,7 +391,16 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>💰 Облік Фінансів</h1>
+      <h1>
+        <AccountBalanceWalletIcon
+          style={{
+            fontSize: "1em",
+            marginRight: "8px",
+            verticalAlign: "middle",
+          }}
+        />
+        Облік Фінансів
+      </h1>
 
       {/* Секція балансу */}
       <div className="balance-section">
@@ -415,187 +452,265 @@ function App() {
         </div>
       </div>
 
-      {/* Секція додавання нового дня */}
-      <div className="add-entry-section">
-        <h3>➕ Додати новий день</h3>
+      {/* Кнопка для відкриття модалу */}
+      <button className="add-day-button" onClick={handleOpenModal}>
+        <AddCircleIcon style={{ fontSize: "1.2em", marginRight: "6px" }} />
+        Додати новий день
+      </button>
 
-        <div className="form-group" style={{ marginBottom: "25px" }}>
-          <label htmlFor="date-input">Дата</label>
-          <input
-            id="date-input"
-            type="date"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            aria-label="Дата"
-          />
-        </div>
-
-        <h4 style={{ marginBottom: "15px", color: "#555" }}>
-          📝 Записи (ПІБ + сума)
-        </h4>
-        <div className="entry-form">
-          <div className="form-group">
-            <label htmlFor="person-name">ПІБ</label>
-            <input
-              id="person-name"
-              type="text"
-              value={newPersonName}
-              onChange={(e) => setNewPersonName(e.target.value)}
-              placeholder="Введіть ПІБ"
-              aria-label="ПІБ особи"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="amount-input">Сума</label>
-            <input
-              id="amount-input"
-              type="number"
-              value={newAmount}
-              onChange={(e) => setNewAmount(e.target.value)}
-              placeholder="0.00"
-              aria-label="Сума"
-              step="0.01"
-            />
-          </div>
-        </div>
-
-        <button className="btn btn-primary" onClick={handleAddEntry}>
-          Додати запис
-        </button>
-
-        {currentEntries.length > 0 && (
-          <div className="entries-list">
-            <h4>Додані записи:</h4>
-            {currentEntries.map((entry, index) => (
-              <div key={`${entry.name}-${index}`} className="entry-item">
-                <div className="entry-info">
-                  <div className="entry-name">{entry.name}</div>
-                  <div className="entry-amount">
-                    {formatCurrency(entry.amount)} грн
-                  </div>
-                </div>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => handleRemoveEntry(index)}
-                  aria-label={`Видалити запис ${entry.name}`}
-                >
-                  Видалити
-                </button>
-              </div>
-            ))}
-
-            <div
+      {/* Модальне вікно */}
+      <Modal
+        isOpen={showModal}
+        onRequestClose={handleCloseModal}
+        className="modal-content"
+        overlayClassName="modal-overlay"
+        closeTimeoutMS={300}
+      >
+        <div className="modal-header">
+          <h3>
+            <AddCircleIcon
               style={{
-                marginTop: "25px",
-                padding: "20px",
-                background: "#fff3cd",
-                borderRadius: "10px",
-                border: "2px solid #ffc107",
+                fontSize: "1em",
+                marginRight: "8px",
+                verticalAlign: "middle",
               }}
-            >
-              <h4 style={{ marginBottom: "10px", color: "#856404" }}>
-                💼 Витрати на персонал за день
-              </h4>
-              <p
-                style={{
-                  marginBottom: "10px",
-                  fontSize: "0.9em",
-                  color: "#856404",
-                }}
-              >
-                Загальна сума витрат на персонал для цього дня
-              </p>
+            />
+            Додати новий день
+          </h3>
+          <button
+            className="modal-close"
+            onClick={handleCloseModal}
+            aria-label="Закрити"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="modal-body">
+          <div className="form-group" style={{ marginBottom: "25px" }}>
+            <label htmlFor="date-input">Дата</label>
+            <input
+              id="date-input"
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              aria-label="Дата"
+            />
+          </div>
+
+          <h4
+            style={{
+              marginBottom: "15px",
+              color: "#555",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+          >
+            <DescriptionIcon style={{ fontSize: "1.1em" }} />
+            Записи (ПІБ + сума)
+          </h4>
+          <div className="entry-form">
+            <div className="form-group">
+              <label htmlFor="person-name">ПІБ</label>
               <input
-                type="number"
-                value={newPersonnel}
-                onChange={(e) => setNewPersonnel(e.target.value)}
-                placeholder="0.00"
-                aria-label="Витрати на персонал"
-                step="0.01"
-                style={{
-                  width: "100%",
-                  padding: "12px 15px",
-                  border: "2px solid #ffc107",
-                  borderRadius: "8px",
-                  fontSize: "1.1em",
-                  marginBottom: "15px",
-                }}
+                id="person-name"
+                type="text"
+                value={newPersonName}
+                onChange={(e) => setNewPersonName(e.target.value)}
+                placeholder="Введіть ПІБ"
+                aria-label="ПІБ особи"
               />
             </div>
-
-            <button
-              className="btn btn-primary"
-              onClick={handleSaveDay}
-              style={{ marginTop: "15px", width: "100%" }}
-            >
-              💾 Зберегти день
-            </button>
+            <div className="form-group">
+              <label htmlFor="amount-input">Сума</label>
+              <input
+                id="amount-input"
+                type="number"
+                value={newAmount}
+                onChange={(e) => setNewAmount(e.target.value)}
+                placeholder="0.00"
+                aria-label="Сума"
+                step="0.01"
+              />
+            </div>
           </div>
-        )}
-      </div>
+
+          <button className="btn btn-primary" onClick={handleAddEntry}>
+            Додати запис
+          </button>
+
+          {currentEntries.length > 0 && (
+            <div className="entries-list">
+              <h4>Додані записи:</h4>
+              {currentEntries.map((entry, index) => (
+                <div key={`${entry.name}-${index}`} className="entry-item">
+                  <div className="entry-info">
+                    <div className="entry-name">{entry.name}</div>
+                    <div className="entry-amount">
+                      {formatCurrency(entry.amount)} грн
+                    </div>
+                  </div>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => handleRemoveEntry(index)}
+                    aria-label={`Видалити запис ${entry.name}`}
+                  >
+                    Видалити
+                  </button>
+                </div>
+              ))}
+
+              <div
+                style={{
+                  marginTop: "25px",
+                  padding: "20px",
+                  background: "#fff3cd",
+                  borderRadius: "10px",
+                  border: "2px solid #ffc107",
+                }}
+              >
+                <h4
+                  style={{
+                    marginBottom: "10px",
+                    color: "#856404",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                  }}
+                >
+                  <WorkIcon style={{ fontSize: "1.1em" }} />
+                  Витрати на персонал за день
+                </h4>
+                <p
+                  style={{
+                    marginBottom: "10px",
+                    fontSize: "0.9em",
+                    color: "#856404",
+                  }}
+                >
+                  Загальна сума витрат на персонал для цього дня
+                </p>
+                <input
+                  type="number"
+                  value={newPersonnel}
+                  onChange={(e) => setNewPersonnel(e.target.value)}
+                  placeholder="0.00"
+                  aria-label="Витрати на персонал"
+                  step="0.01"
+                  style={{
+                    width: "100%",
+                    padding: "12px 15px",
+                    border: "2px solid #ffc107",
+                    borderRadius: "8px",
+                    fontSize: "1.1em",
+                    marginBottom: "15px",
+                  }}
+                />
+              </div>
+
+              <button
+                className="btn btn-primary"
+                onClick={handleSaveDay}
+                style={{
+                  marginTop: "15px",
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "8px",
+                }}
+              >
+                <SaveIcon style={{ fontSize: "1.1em" }} />
+                Зберегти день
+              </button>
+            </div>
+          )}
+        </div>
+      </Modal>
 
       {/* Список днів */}
       <div className="days-section">
-        <h3>📅 Записи по днях</h3>
+        <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <EventIcon style={{ fontSize: "1em" }} />
+          Записи по днях
+        </h3>
         {days.length === 0 ? (
           <div className="empty-state">
             <p>Поки немає жодних записів. Додайте перший день!</p>
           </div>
         ) : (
-          days.map((day) => {
-            const dayTotal = day.entries.reduce(
-              (sum, entry) => sum + (entry.amount || 0),
-              0,
-            );
-            return (
-              <div key={day.id} className="day-card">
-                <div className="day-header">
-                  <div className="day-date">{formatDate(day.date)}</div>
-                  <button
-                    className="btn btn-danger"
-                    onClick={() => handleDeleteDay(day.id)}
-                    aria-label={`Видалити день ${formatDate(day.date)}`}
-                  >
-                    Видалити
-                  </button>
-                </div>
+          <div className="days-grid">
+            {days.map((day) => {
+              const dayTotal = day.entries.reduce(
+                (sum, entry) => sum + (entry.amount || 0),
+                0,
+              );
+              const finalTotal = dayTotal - (day.personnel || 0);
+              return (
+                <div key={day.id} className="day-card-compact">
+                  <div className="day-card-header">
+                    <div className="day-date-compact">
+                      <EventIcon style={{ fontSize: "1.1em" }} />
+                      {formatDate(day.date)}
+                    </div>
+                    <button
+                      className="btn-delete-compact"
+                      onClick={() => handleDeleteDay(day.id)}
+                      aria-label={`Видалити день ${formatDate(day.date)}`}
+                      title="Видалити"
+                    >
+                      <DeleteOutlineIcon style={{ fontSize: "1.1em" }} />
+                    </button>
+                  </div>
 
-                {day.entries.map((entry, index) => (
-                  <div key={`${day.id}-${index}`} className="entry-item">
-                    <div className="entry-info">
-                      <div className="entry-name">{entry.name}</div>
-                      <div className="entry-amount">
-                        +{formatCurrency(entry.amount)} грн
+                  <div className="day-card-body">
+                    <div className="entries-compact">
+                      {day.entries.map((entry, index) => (
+                        <div key={`${day.id}-${index}`} className="entry-row">
+                          <span className="entry-name-compact">
+                            {entry.name}
+                          </span>
+                          <span className="entry-amount-compact positive">
+                            +{formatCurrency(entry.amount)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {day.personnel > 0 && (
+                      <div className="personnel-row">
+                        <span
+                          className="personnel-label-compact"
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "6px",
+                          }}
+                        >
+                          <WorkIcon style={{ fontSize: "1em" }} />
+                          Персонал
+                        </span>
+                        <span className="personnel-amount-compact">
+                          -{formatCurrency(day.personnel)}
+                        </span>
                       </div>
-                    </div>
+                    )}
                   </div>
-                ))}
 
-                {day.personnel > 0 && (
-                  <div className="personnel-section">
-                    <div className="personnel-label">Персонал (витрати):</div>
-                    <div className="personnel-value">
-                      -{formatCurrency(day.personnel)} грн
-                    </div>
-                  </div>
-                )}
-
-                <div
-                  className="day-header"
-                  style={{
-                    marginTop: "15px",
-                    paddingTop: "15px",
-                    borderTop: "2px solid #f0f0f0",
-                  }}
-                >
-                  <div style={{ fontWeight: "600" }}>Підсумок дня:</div>
-                  <div className="day-total">
-                    {formatCurrency(dayTotal - day.personnel)} грн
+                  <div className="day-card-footer">
+                    <span className="footer-label">Підсумок:</span>
+                    <span
+                      className={`footer-total ${finalTotal >= 0 ? "positive" : "negative"}`}
+                    >
+                      {finalTotal >= 0 ? "+" : ""}
+                      {formatCurrency(finalTotal)} грн
+                    </span>
                   </div>
                 </div>
-              </div>
-            );
-          })
+              );
+            })}
+          </div>
         )}
       </div>
     </div>
