@@ -508,7 +508,9 @@ function App() {
           ) : (
             <div className="balance-edit-inline">
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={balanceInput}
                 onChange={(e) => setBalanceInput(e.target.value)}
                 placeholder="Введіть баланс"
@@ -640,12 +642,13 @@ function App() {
               <label htmlFor="amount-input">Сума</label>
               <input
                 id="amount-input"
-                type="number"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 value={newAmount}
                 onChange={(e) => setNewAmount(e.target.value)}
-                placeholder="0.00"
+                placeholder="0"
                 aria-label="Сума"
-                step="0.01"
               />
             </div>
           </div>
@@ -706,12 +709,13 @@ function App() {
                   Загальна сума витрат на персонал для цього дня
                 </p>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   value={newPersonnel}
                   onChange={(e) => setNewPersonnel(e.target.value)}
-                  placeholder="0.00"
+                  placeholder="0"
                   aria-label="Витрати на персонал"
-                  step="0.01"
                   style={{
                     width: "100%",
                     padding: "12px 15px",
