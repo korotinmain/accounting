@@ -11,6 +11,9 @@ import SaveIcon from "@mui/icons-material/Save";
 import EventIcon from "@mui/icons-material/Event";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import {
   collection,
   addDoc,
@@ -391,64 +394,99 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>
-        <AccountBalanceWalletIcon
-          style={{
-            fontSize: "1em",
-            marginRight: "8px",
-            verticalAlign: "middle",
-          }}
-        />
-        Облік Фінансів
-      </h1>
+      <header className="app-header">
+        <div className="header-content">
+          <div className="header-icon">
+            <AccountBalanceWalletIcon />
+          </div>
+          <div className="header-text">
+            <h1>Облік Фінансів</h1>
+            <p className="header-subtitle">Управління вашими фінансами</p>
+          </div>
+        </div>
+      </header>
 
       {/* Секція балансу */}
-      <div className="balance-section">
-        <h2>Початковий баланс</h2>
-        {!editingBalance ? (
-          <>
-            <div className="balance-value">
-              {formatCurrency(initialBalance)} грн
+      <div className="balance-cards">
+        <div className="balance-card initial-balance">
+          <div className="balance-card-header">
+            <div className="balance-card-icon">
+              <AccountBalanceIcon />
             </div>
-            <button
-              className="btn btn-secondary"
-              onClick={() => {
-                setEditingBalance(true);
-                setBalanceInput(initialBalance.toString());
-              }}
-              aria-label="Редагувати початковий баланс"
-            >
-              Редагувати
-            </button>
-          </>
-        ) : (
-          <div className="balance-edit">
-            <input
-              type="number"
-              value={balanceInput}
-              onChange={(e) => setBalanceInput(e.target.value)}
-              placeholder="Введіть баланс"
-              aria-label="Початковий баланс"
-              autoFocus
-            />
-            <button className="btn btn-primary" onClick={handleSaveBalance}>
-              Зберегти
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => {
-                setEditingBalance(false);
-                setBalanceInput("");
-              }}
-            >
-              Скасувати
-            </button>
+            <span className="balance-card-title">Початковий баланс</span>
+            {!editingBalance && (
+              <button
+                className="btn-edit-balance"
+                onClick={() => {
+                  setEditingBalance(true);
+                  setBalanceInput(initialBalance.toString());
+                }}
+                aria-label="Редагувати початковий баланс"
+                title="Редагувати"
+              >
+                <EditIcon style={{ fontSize: "1em" }} />
+              </button>
+            )}
           </div>
-        )}
 
-        <h2 style={{ marginTop: "30px" }}>Поточний залишок</h2>
-        <div className="balance-value">
-          {formatCurrency(currentBalance)} грн
+          {!editingBalance ? (
+            <div className="balance-card-amount">
+              {formatCurrency(initialBalance)}
+              <span className="balance-currency">грн</span>
+            </div>
+          ) : (
+            <div className="balance-edit-inline">
+              <input
+                type="number"
+                value={balanceInput}
+                onChange={(e) => setBalanceInput(e.target.value)}
+                placeholder="Введіть баланс"
+                aria-label="Початковий баланс"
+                autoFocus
+              />
+              <div className="balance-edit-actions">
+                <button
+                  className="btn btn-primary btn-sm"
+                  onClick={handleSaveBalance}
+                >
+                  <SaveIcon style={{ fontSize: "1em" }} />
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setEditingBalance(false);
+                    setBalanceInput("");
+                  }}
+                >
+                  <CloseIcon style={{ fontSize: "1em" }} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="balance-card current-balance">
+          <div className="balance-card-header">
+            <div className="balance-card-icon current">
+              <TrendingUpIcon />
+            </div>
+            <span className="balance-card-title">Поточний залишок</span>
+          </div>
+          <div className="balance-card-amount">
+            {formatCurrency(currentBalance)}
+            <span className="balance-currency">грн</span>
+          </div>
+          <div className="balance-card-trend">
+            {currentBalance >= initialBalance ? (
+              <span className="trend-positive">
+                ↑ {formatCurrency(currentBalance - initialBalance)}
+              </span>
+            ) : (
+              <span className="trend-negative">
+                ↓ {formatCurrency(initialBalance - currentBalance)}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
