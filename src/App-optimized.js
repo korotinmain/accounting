@@ -15,6 +15,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import GroupsIcon from "@mui/icons-material/Groups";
+import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import {
   collection,
   addDoc,
@@ -23,6 +25,8 @@ import {
   deleteDoc,
   doc,
   Timestamp,
+  query,
+  where,
 } from "firebase/firestore";
 import { COLLECTIONS, SWAL_CONFIG, MESSAGES } from "./constants";
 import {
@@ -50,7 +54,9 @@ Modal.setAppElement("#root");
 
 function App() {
   // State management
-  const [initialBalance, setInitialBalance] = useState(0);
+  const [activeTab, setActiveTab] = useState("personnel"); // 'personnel' or 'operational'
+  const [initialBalancePersonnel, setInitialBalancePersonnel] = useState(0);
+  const [initialBalanceOperational, setInitialBalanceOperational] = useState(0);
   const [editingBalance, setEditingBalance] = useState(false);
   const [balanceInput, setBalanceInput] = useState("");
 
@@ -66,82 +72,102 @@ function App() {
   const [showModal, setShowModal] = useState(false);
   const [editingDayId, setEditingDayId] = useState(null);
 
+  // Computed values based on active tab
+  const initialBalance =
+    activeTab === "personnel"
+      ? initialBalancePersonnel
+      : initialBalanceOperational;
+
   // Завантаження даних
-  const loadData = useCallback(async (silent = false) => {
-    if (!db) {
-      const errorMsg = MESSAGES.ERRORS.FIREBASE_NOT_INITIALIZED;
-      console.error(errorMsg);
-      setError(errorMsg);
-      Swal.fire({
-        icon: "error",
-        title: "Помилка підключення",
-        text: errorMsg,
-        confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
-      });
-      setLoading(false);
-      return;
-    }
-
-    try {
-      if (!silent) {
-        setLoading(true);
-      }
-      setError(null);
-
-      // Завантажити початковий баланс
-      try {
-        const balanceSnapshot = await getDocs(
-          collection(db, COLLECTIONS.SETTINGS),
-        );
-        if (!balanceSnapshot.empty) {
-          const balanceDoc = balanceSnapshot.docs[0];
-          const balance = balanceDoc.data().initialBalance || 0;
-          setInitialBalance(sanitizeNumber(balance));
-        }
-      } catch (balanceError) {
-        console.warn(
-          "Баланс не знайдено, використовуємо 0:",
-          balanceError.message,
-        );
-      }
-
-      // Завантажити дні
-      try {
-        const daysSnapshot = await getDocs(collection(db, COLLECTIONS.DAYS));
-        const daysData = daysSnapshot.docs.map((docSnap) => {
-          const data = docSnap.data();
-          return {
-            id: docSnap.id,
-            ...data,
-            date: data.date?.toDate ? data.date.toDate() : new Date(),
-            entries: data.entries || [],
-            personnel: sanitizeNumber(data.personnel || 0),
-          };
+  const loadData = useCallback(
+    async (silent = false) => {
+      if (!db) {
+        const errorMsg = MESSAGES.ERRORS.FIREBASE_NOT_INITIALIZED;
+        console.error(errorMsg);
+        setError(errorMsg);
+        Swal.fire({
+          icon: "error",
+          title: "Помилка підключення",
+          text: errorMsg,
+          confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
         });
-
-        // Сортуємо за датою: найновіші зверху
-        daysData.sort((a, b) => {
-          const dateA = a.date instanceof Date ? a.date : new Date(a.date);
-          const dateB = b.date instanceof Date ? b.date : new Date(b.date);
-          return dateB.getTime() - dateA.getTime();
-        });
-
-        setDays(daysData);
-      } catch (daysError) {
-        console.warn("Дні не знайдено:", daysError.message);
-        setDays([]);
-      }
-
-      if (!silent) {
         setLoading(false);
+        return;
       }
-    } catch (error) {
-      console.error("Критична помилка завантаження даних:", error);
-      setError(error.message);
-      Swal.fire({
-        icon: "error",
-        title: "Помилка завантаження",
-        html: `
+
+      try {
+        if (!silent) {
+          setLoading(true);
+        }
+        setError(null);
+
+        // Завантажити початкові баланси (обидва)
+        try {
+          const balanceSnapshot = await getDocs(
+            collection(db, COLLECTIONS.SETTINGS),
+          );
+          if (!balanceSnapshot.empty) {
+            balanceSnapshot.docs.forEach((docSnap) => {
+              const data = docSnap.data();
+              if (data.type === "personnel") {
+                setInitialBalancePersonnel(
+                  sanitizeNumber(data.initialBalance || 0),
+                );
+              } else if (data.type === "operational") {
+                setInitialBalanceOperational(
+                  sanitizeNumber(data.initialBalance || 0),
+                );
+              }
+            });
+          }
+        } catch (balanceError) {
+          console.warn(
+            "Баланс не знайдено, використовуємо 0:",
+            balanceError.message,
+          );
+        }
+
+        // Завантажити дні для поточного табу
+        try {
+          const daysQuery = query(
+            collection(db, COLLECTIONS.DAYS),
+            where("type", "==", activeTab),
+          );
+          const daysSnapshot = await getDocs(daysQuery);
+          const daysData = daysSnapshot.docs.map((docSnap) => {
+            const data = docSnap.data();
+            return {
+              id: docSnap.id,
+              ...data,
+              date: data.date?.toDate ? data.date.toDate() : new Date(),
+              entries: data.entries || [],
+              personnel: sanitizeNumber(data.personnel || 0),
+            };
+          });
+
+          // Сортуємо за датою: найновіші зверху
+          daysData.sort((a, b) => {
+            const dateA = a.date instanceof Date ? a.date : new Date(a.date);
+            const dateB = b.date instanceof Date ? b.date : new Date(b.date);
+            return dateB.getTime() - dateA.getTime();
+          });
+
+          setDays(daysData);
+        } catch (daysError) {
+          console.warn("Дні не знайдено:", daysError.message);
+          setDays([]);
+        }
+
+        if (!silent) {
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error("Критична помилка завантаження даних:", error);
+        setError(error.message);
+        Swal.fire({
+          icon: "error",
+          title: "Помилка завантаження",
+          html: `
           <p>Помилка підключення до бази даних: <strong>${error.message}</strong></p>
           <br>
           <p style="text-align: left;">Переконайтесь що:</p>
@@ -151,16 +177,24 @@ function App() {
             <li>Конфігурація Firebase правильна</li>
           </ol>
         `,
-        confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
-        width: "600px",
-      });
-      setLoading(false);
-    }
-  }, []);
+          confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
+          width: "600px",
+        });
+        setLoading(false);
+      }
+    },
+    [activeTab],
+  );
 
   useEffect(() => {
     loadData();
   }, [loadData]);
+
+  // Перезавантажуємо дані при зміні табу
+  useEffect(() => {
+    loadData(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
 
   // Обробники подій
   const handleSaveBalance = useCallback(async () => {
@@ -180,20 +214,33 @@ function App() {
       const balanceSnapshot = await getDocs(
         collection(db, COLLECTIONS.SETTINGS),
       );
-      if (balanceSnapshot.empty) {
+
+      // Шукаємо документ для поточного типу
+      const existingDoc = balanceSnapshot.docs.find(
+        (doc) => doc.data().type === activeTab,
+      );
+
+      if (!existingDoc) {
+        // Створюємо новий документ
         await addDoc(collection(db, COLLECTIONS.SETTINGS), {
+          type: activeTab,
           initialBalance: newBalance,
           updatedAt: Timestamp.now(),
         });
       } else {
-        const balanceDoc = balanceSnapshot.docs[0];
-        await updateDoc(doc(db, COLLECTIONS.SETTINGS, balanceDoc.id), {
+        // Оновлюємо існуючий
+        await updateDoc(doc(db, COLLECTIONS.SETTINGS, existingDoc.id), {
           initialBalance: newBalance,
           updatedAt: Timestamp.now(),
         });
       }
 
-      setInitialBalance(newBalance);
+      if (activeTab === "personnel") {
+        setInitialBalancePersonnel(newBalance);
+      } else {
+        setInitialBalanceOperational(newBalance);
+      }
+
       setEditingBalance(false);
       setBalanceInput("");
 
@@ -213,7 +260,7 @@ function App() {
         confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
       });
     }
-  }, [balanceInput]);
+  }, [balanceInput, activeTab]);
 
   const handleAddEntry = useCallback(() => {
     if (!validateRequired(newPersonName) || !validateRequired(newAmount)) {
@@ -274,7 +321,8 @@ function App() {
       return;
     }
 
-    const personnel = sanitizeNumber(newPersonnel || 0);
+    const personnel =
+      activeTab === "personnel" ? sanitizeNumber(newPersonnel || 0) : 0;
 
     try {
       const dateObj = new Date(newDate);
@@ -285,6 +333,7 @@ function App() {
           date: Timestamp.fromDate(dateObj),
           entries: currentEntries,
           personnel: personnel,
+          type: activeTab,
           updatedAt: Timestamp.now(),
         });
       } else {
@@ -293,6 +342,7 @@ function App() {
           date: Timestamp.fromDate(dateObj),
           entries: currentEntries,
           personnel: personnel,
+          type: activeTab,
           createdAt: Timestamp.now(),
         });
       }
@@ -323,7 +373,14 @@ function App() {
         confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
       });
     }
-  }, [newDate, currentEntries, newPersonnel, editingDayId, loadData]);
+  }, [
+    newDate,
+    currentEntries,
+    newPersonnel,
+    editingDayId,
+    loadData,
+    activeTab,
+  ]);
 
   const handleOpenModal = useCallback((day = null) => {
     if (day) {
@@ -419,10 +476,15 @@ function App() {
         (sum, entry) => sum + (entry.amount || 0),
         0,
       );
-      balance += dayTotal - (day.personnel || 0);
+      // Для операційної персонал не віднімаємо
+      if (activeTab === "personnel") {
+        balance += dayTotal - (day.personnel || 0);
+      } else {
+        balance += dayTotal;
+      }
     });
     return balance;
-  }, [initialBalance, sortedDays]);
+  }, [initialBalance, sortedDays, activeTab]);
 
   // Форматування
   const formatDate = useCallback((date) => {
@@ -444,7 +506,53 @@ function App() {
   if (loading) {
     return (
       <div className="app-container">
-        <div className="loading">Завантаження</div>
+        <header className="app-header">
+          <div className="header-content">
+            <div className="header-icon skeleton-icon"></div>
+            <div className="header-text">
+              <div className="skeleton skeleton-title"></div>
+              <div className="skeleton skeleton-subtitle"></div>
+            </div>
+          </div>
+        </header>
+
+        <div className="tabs-container">
+          <div className="skeleton skeleton-tab"></div>
+          <div className="skeleton skeleton-tab"></div>
+        </div>
+
+        <div className="balance-cards">
+          <div className="balance-card">
+            <div className="balance-card-header">
+              <div className="skeleton skeleton-icon-small"></div>
+              <div className="skeleton skeleton-text"></div>
+            </div>
+            <div className="skeleton skeleton-amount"></div>
+          </div>
+          <div className="balance-card">
+            <div className="balance-card-header">
+              <div className="skeleton skeleton-icon-small"></div>
+              <div className="skeleton skeleton-text"></div>
+            </div>
+            <div className="skeleton skeleton-amount"></div>
+            <div className="skeleton skeleton-trend"></div>
+          </div>
+        </div>
+
+        <div className="skeleton skeleton-button"></div>
+
+        <div className="days-section">
+          <div className="skeleton skeleton-heading"></div>
+          <div className="days-grid">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="day-card-compact skeleton-card">
+                <div className="skeleton skeleton-card-header"></div>
+                <div className="skeleton skeleton-card-body"></div>
+                <div className="skeleton skeleton-card-footer"></div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -476,6 +584,26 @@ function App() {
           </div>
         </div>
       </header>
+
+      {/* Перемикач табів */}
+      <div className="tabs-container">
+        <button
+          className={`tab-button ${activeTab === "personnel" ? "active" : ""}`}
+          onClick={() => setActiveTab("personnel")}
+        >
+          <GroupsIcon style={{ fontSize: "1.2em", marginRight: "8px" }} />
+          <span>Персонал</span>
+        </button>
+        <button
+          className={`tab-button ${activeTab === "operational" ? "active" : ""}`}
+          onClick={() => setActiveTab("operational")}
+        >
+          <BusinessCenterIcon
+            style={{ fontSize: "1.2em", marginRight: "8px" }}
+          />
+          <span>Операційна</span>
+        </button>
+      </div>
 
       {/* Секція балансу */}
       <div className="balance-cards">
@@ -678,54 +806,56 @@ function App() {
                 </div>
               ))}
 
-              <div
-                style={{
-                  marginTop: "25px",
-                  padding: "20px",
-                  background: "#fff3cd",
-                  borderRadius: "10px",
-                  border: "2px solid #ffc107",
-                }}
-              >
-                <h4
+              {activeTab === "personnel" && (
+                <div
                   style={{
-                    marginBottom: "10px",
-                    color: "#856404",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                  }}
-                >
-                  <WorkIcon style={{ fontSize: "1.1em" }} />
-                  Витрати на персонал за день
-                </h4>
-                <p
-                  style={{
-                    marginBottom: "10px",
-                    fontSize: "0.9em",
-                    color: "#856404",
-                  }}
-                >
-                  Загальна сума витрат на персонал для цього дня
-                </p>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={newPersonnel}
-                  onChange={(e) => setNewPersonnel(e.target.value)}
-                  placeholder="0"
-                  aria-label="Витрати на персонал"
-                  style={{
-                    width: "100%",
-                    padding: "12px 15px",
+                    marginTop: "25px",
+                    padding: "20px",
+                    background: "#fff3cd",
+                    borderRadius: "10px",
                     border: "2px solid #ffc107",
-                    borderRadius: "8px",
-                    fontSize: "1.1em",
-                    marginBottom: "15px",
                   }}
-                />
-              </div>
+                >
+                  <h4
+                    style={{
+                      marginBottom: "10px",
+                      color: "#856404",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "8px",
+                    }}
+                  >
+                    <WorkIcon style={{ fontSize: "1.1em" }} />
+                    Витрати на персонал за день
+                  </h4>
+                  <p
+                    style={{
+                      marginBottom: "10px",
+                      fontSize: "0.9em",
+                      color: "#856404",
+                    }}
+                  >
+                    Загальна сума витрат на персонал для цього дня
+                  </p>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={newPersonnel}
+                    onChange={(e) => setNewPersonnel(e.target.value)}
+                    placeholder="0"
+                    aria-label="Витрати на персонал"
+                    style={{
+                      width: "100%",
+                      padding: "12px 15px",
+                      border: "2px solid #ffc107",
+                      borderRadius: "8px",
+                      fontSize: "1.1em",
+                      marginBottom: "15px",
+                    }}
+                  />
+                </div>
+              )}
 
               <button
                 className="btn btn-primary"
@@ -764,7 +894,11 @@ function App() {
                 (sum, entry) => sum + (entry.amount || 0),
                 0,
               );
-              const finalTotal = dayTotal - (day.personnel || 0);
+              // Для операційної не віднімаємо персонал
+              const finalTotal =
+                activeTab === "personnel"
+                  ? dayTotal - (day.personnel || 0)
+                  : dayTotal;
               return (
                 <div key={day.id} className="day-card-compact">
                   <div className="day-card-header">
@@ -806,7 +940,7 @@ function App() {
                       ))}
                     </div>
 
-                    {day.personnel > 0 && (
+                    {activeTab === "personnel" && day.personnel > 0 && (
                       <div className="personnel-row">
                         <span
                           className="personnel-label-compact"
