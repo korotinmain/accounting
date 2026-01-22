@@ -17,6 +17,7 @@ import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   collection,
   addDoc,
@@ -71,6 +72,11 @@ function App() {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingDayId, setEditingDayId] = useState(null);
+  
+  // Фільтри
+  const [dateFilter, setDateFilter] = useState("all"); // 'all', 'week', 'month', 'year', 'custom'
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
 
   // Computed values based on active tab
   const initialBalance =
@@ -193,6 +199,9 @@ function App() {
   // Перезавантажуємо дані при зміні табу
   useEffect(() => {
     loadData(true);
+    // Скидаємо стан редагування балансу при зміні табу
+    setEditingBalance(false);
+    setBalanceInput("");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
@@ -459,14 +468,45 @@ function App() {
     [loadData],
   );
 
-  // Відсортовані дні (найсвіжіші зверху)
+  // Відсортовані та відфільтровані дні
   const sortedDays = useMemo(() => {
-    return [...days].sort((a, b) => {
+    const now = new Date();
+    let filtered = [...days];
+
+    if (dateFilter === "week") {
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+      filtered = filtered.filter((day) => {
+        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        return dayDate >= weekAgo;
+      });
+    } else if (dateFilter === "month") {
+      const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      filtered = filtered.filter((day) => {
+        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        return dayDate >= monthAgo;
+      });
+    } else if (dateFilter === "year") {
+      const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      filtered = filtered.filter((day) => {
+        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        return dayDate >= yearAgo;
+      });
+    } else if (dateFilter === "custom" && customStartDate && customEndDate) {
+      const startDate = new Date(customStartDate);
+      const endDate = new Date(customEndDate);
+      endDate.setHours(23, 59, 59, 999); // Включаємо кінцеву дату повністю
+      filtered = filtered.filter((day) => {
+        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        return dayDate >= startDate && dayDate <= endDate;
+      });
+    }
+
+    return filtered.sort((a, b) => {
       const dateA = a.date instanceof Date ? a.date : new Date(a.date);
       const dateB = b.date instanceof Date ? b.date : new Date(b.date);
       return dateB.getTime() - dateA.getTime();
     });
-  }, [days]);
+  }, [days, dateFilter, customStartDate, customEndDate]);
 
   // Обчислення балансу
   const currentBalance = useMemo(() => {
@@ -870,11 +910,77 @@ function App() {
         </div>
       </Modal>
 
+      {/* Фільтри */}
+      <div className="filters-section">
+        <h4 className="filters-title">
+          <FilterListIcon style={{ fontSize: "1em" }} />
+          Фільтр по датах
+        </h4>
+        <div className="filters-buttons">
+          <button
+            className={`filter-btn ${dateFilter === "all" ? "active" : ""}`}
+            onClick={() => setDateFilter("all")}
+          >
+            Всі
+          </button>
+          <button
+            className={`filter-btn ${dateFilter === "week" ? "active" : ""}`}
+            onClick={() => setDateFilter("week")}
+          >
+            Тиждень
+          </button>
+          <button
+            className={`filter-btn ${dateFilter === "month" ? "active" : ""}`}
+            onClick={() => setDateFilter("month")}
+          >
+            Місяць
+          </button>
+          <button
+            className={`filter-btn ${dateFilter === "year" ? "active" : ""}`}
+            onClick={() => setDateFilter("year")}
+          >
+            Рік
+          </button>
+          <button
+            className={`filter-btn ${dateFilter === "custom" ? "active" : ""}`}
+            onClick={() => setDateFilter("custom")}
+          >
+            Власний період
+          </button>
+        </div>
+        
+        {dateFilter === "custom" && (
+          <div className="custom-date-range">
+            <div className="date-input-group">
+              <label>Від:</label>
+              <input
+                type="date"
+                value={customStartDate}
+                onChange={(e) => setCustomStartDate(e.target.value)}
+                className="date-input"
+              />
+            </div>
+            <div className="date-input-group">
+              <label>До:</label>
+              <input
+                type="date"
+                value={customEndDate}
+                onChange={(e) => setCustomEndDate(e.target.value)}
+                className="date-input"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Список днів */}
       <div className="days-section">
         <h3 style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <EventIcon style={{ fontSize: "1em" }} />
           Записи по днях
+          {dateFilter !== "all" && (
+            <span className="filter-badge">({sortedDays.length})</span>
+          )}
         </h3>
         {sortedDays.length === 0 ? (
           <div className="empty-state">
