@@ -72,7 +72,7 @@ function App() {
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [editingDayId, setEditingDayId] = useState(null);
-  
+
   // Фільтри
   const [dateFilter, setDateFilter] = useState("all"); // 'all', 'week', 'month', 'year', 'custom'
   const [customStartDate, setCustomStartDate] = useState("");
@@ -476,19 +476,30 @@ function App() {
     if (dateFilter === "week") {
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       filtered = filtered.filter((day) => {
-        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        const dayDate =
+          day.date instanceof Date ? day.date : new Date(day.date);
         return dayDate >= weekAgo;
       });
     } else if (dateFilter === "month") {
-      const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+      const monthAgo = new Date(
+        now.getFullYear(),
+        now.getMonth() - 1,
+        now.getDate(),
+      );
       filtered = filtered.filter((day) => {
-        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        const dayDate =
+          day.date instanceof Date ? day.date : new Date(day.date);
         return dayDate >= monthAgo;
       });
     } else if (dateFilter === "year") {
-      const yearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+      const yearAgo = new Date(
+        now.getFullYear() - 1,
+        now.getMonth(),
+        now.getDate(),
+      );
       filtered = filtered.filter((day) => {
-        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        const dayDate =
+          day.date instanceof Date ? day.date : new Date(day.date);
         return dayDate >= yearAgo;
       });
     } else if (dateFilter === "custom" && customStartDate && customEndDate) {
@@ -496,7 +507,8 @@ function App() {
       const endDate = new Date(customEndDate);
       endDate.setHours(23, 59, 59, 999); // Включаємо кінцеву дату повністю
       filtered = filtered.filter((day) => {
-        const dayDate = day.date instanceof Date ? day.date : new Date(day.date);
+        const dayDate =
+          day.date instanceof Date ? day.date : new Date(day.date);
         return dayDate >= startDate && dayDate <= endDate;
       });
     }
@@ -948,7 +960,7 @@ function App() {
             Власний період
           </button>
         </div>
-        
+
         {dateFilter === "custom" && (
           <div className="custom-date-range">
             <div className="date-input-group">
