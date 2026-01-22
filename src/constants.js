@@ -8,6 +8,7 @@ export const COLLECTIONS = {
 export const SWAL_CONFIG = {
   confirmButtonColor: "#6366f1",
   cancelButtonColor: "#94a3b8",
+  dangerButtonColor: "#ef4444",
   timer: 2000,
 };
 
@@ -36,8 +37,11 @@ export const MESSAGES = {
     BALANCE_SAVED: "Баланс успішно оновлено",
     DAY_SAVED: "День збережено успішно!",
     DAY_DELETED: "День успішно видалено",
+    DELETE: "День успішно видалено",
   },
   CONFIRM: {
+    DELETE_TITLE: "Ви впевнені?",
+    DELETE_TEXT: "Цей день буде видалено назавжди!",
     DELETE_DAY: "Цей день буде видалено назавжди!",
   },
 };
