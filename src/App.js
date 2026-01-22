@@ -116,10 +116,11 @@ function App() {
           });
         }
 
-        // Перезавантажуємо баланс
-        activeBalance.loadBalance();
+        // Перезавантажуємо баланс (await для уникнення race condition)
+        await activeBalance.loadBalance();
         handleCloseModal();
       } catch (error) {
+        console.error("Помилка збереження дня:", error);
         Swal.fire({
           icon: "error",
           title: "Помилка",

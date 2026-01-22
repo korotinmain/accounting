@@ -112,6 +112,10 @@ const AddDayModal = ({ isOpen, onClose, onSave, editingDay, activeTab }) => {
     setCurrentEntries((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const handleRemoveWithdrawal = useCallback((index) => {
+    setCurrentWithdrawals((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
   const handleSave = useCallback(() => {
     // Валідація
     if (
@@ -449,11 +453,7 @@ const AddDayModal = ({ isOpen, onClose, onSave, editingDay, activeTab }) => {
                 </div>
                 <button
                   className="btn btn-danger"
-                  onClick={() =>
-                    setCurrentWithdrawals((prev) =>
-                      prev.filter((_, i) => i !== index),
-                    )
-                  }
+                  onClick={() => handleRemoveWithdrawal(index)}
                   aria-label={`Видалити запис ${entry.name}`}
                 >
                   Видалити
