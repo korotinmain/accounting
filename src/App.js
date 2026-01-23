@@ -94,13 +94,15 @@ function App() {
       const dayTotal = day.entries?.reduce((sum, e) => sum + e.amount, 0) || 0;
 
       if (activeTab === "operational") {
+        // Для operational: додаємо доходи (entries) і віднімаємо витрати (withdrawals)
         const withdrawalTotal =
           day.withdrawals?.reduce((sum, w) => sum + w.amount, 0) || 0;
         balance += dayTotal - withdrawalTotal;
-      } else {
-        balance += dayTotal;
       }
+      // Для personnel: entries - це НЕ доходи, це розподіл грошей персоналу
+      // Тому нічого не додаємо з entries
 
+      // Віднімаємо суму персоналу (якщо є)
       if (day.personnel) {
         balance -= day.personnel;
       }
