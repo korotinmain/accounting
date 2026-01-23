@@ -16,12 +16,22 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
   if (!entries || entries.length === 0) {
     return (
       <div className="entries-table-empty">
-        <p>Немає записів за цю дату</p>
+        <p>Немає записів за цей місяць</p>
       </div>
     );
   }
 
   const total = entries.reduce((sum, entry) => sum + entry.amount, 0);
+
+  // Форматування дати
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = date instanceof Date ? date : new Date(date);
+    return d.toLocaleDateString("uk-UA", {
+      day: "2-digit",
+      month: "2-digit",
+    });
+  };
 
   return (
     <div className="entries-table-container">
@@ -29,6 +39,7 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
         <thead>
           <tr>
             <th>№</th>
+            <th>Дата</th>
             <th>ПІБ</th>
             <th>Сума</th>
             {onDelete && <th>Дії</th>}
@@ -47,12 +58,14 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
                   return;
                 }
                 if (onEdit) {
-                  onEdit(entry, index);
+                  console.log("Entry clicked:", entry);
+                  onEdit(entry.id);
                 }
               }}
               className={onEdit ? "clickable-row" : ""}
             >
               <td className="entry-number">{index + 1}</td>
+              <td className="entry-date">{formatDate(entry.date)}</td>
               <td className="entry-name">
                 <PersonIcon className="entry-icon" />
                 <span>{entry.name}</span>
@@ -68,7 +81,7 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
-                      onDelete(entry, index);
+                      onDelete(entry.id || entry);
                     }}
                     title="Видалити"
                   >
@@ -81,7 +94,7 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
         </tbody>
         <tfoot>
           <tr className="total-row">
-            <td colSpan="1">Всього:</td>
+            <td colSpan="2">Всього:</td>
             <td className="hidden-cell" colSpan="1"></td>
             <td colSpan="2" className="total-amount">
               {formatCurrency(total)} грн
@@ -89,7 +102,7 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
           </tr>
           {personnelAmount > 0 && (
             <tr className="personnel-item-row">
-              <td colSpan="1" className="personnel-item-label">
+              <td colSpan="2" className="personnel-item-label">
                 Персонал:
               </td>
               <td className="hidden-cell" colSpan="1"></td>

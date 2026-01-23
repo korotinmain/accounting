@@ -12,7 +12,7 @@ import Header from "../components/Header";
 import TabSwitcher from "../components/TabSwitcher";
 import MonthlyStats from "../components/MonthlyStats";
 import DayCard from "../components/DayCard";
-import AddDayModal from "../components/AddDayModal";
+import EntryModal from "../components/EntryModal";
 import PersonnelModal from "../components/PersonnelModal";
 import LoadingState from "../components/LoadingState";
 import EntriesTable from "../components/EntriesTable";
@@ -33,11 +33,8 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   const [activeTab, setActiveTab] = useState("personnel");
   const [showModal, setShowModal] = useState(false);
   const [showPersonnelModal, setShowPersonnelModal] = useState(false);
-  const [editingDay, setEditingDay] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(() => {
-    return new Date().toISOString().split("T")[0];
-  });
-  const [operationType, setOperationType] = useState("income");
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   // Hooks для personnel
   const personnelBalance = useBalance("personnel");
@@ -53,32 +50,52 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   const activeDays =
     activeTab === "personnel" ? personnelDays : operationalDays;
 
-  // Фільтруємо записи по вибраній даті для Personnel
+  // Фільтруємо записи по вибраному місяцю для Personnel
   const filteredData = useMemo(() => {
-    if (activeTab !== "personnel") return { entries: [], personnelAmount: 0 };
+    if (activeTab !== "personnel")
+      return { entries: [], personnelAmount: 0, days: [] };
 
-    const daysForDate = personnelDays.days.filter((day) => {
-      const dayDate =
-        day.dateString ||
-        (day.date?.toDate
-          ? day.date.toDate().toISOString().split("T")[0]
-          : new Date(day.date).toISOString().split("T")[0]);
-      return dayDate === selectedDate;
+    const selectedMonthValue = selectedMonth.getMonth();
+    const selectedYear = selectedMonth.getFullYear();
+
+    const daysForMonth = personnelDays.days.filter((day) => {
+      const dayDate = day.dateString
+        ? new Date(day.dateString)
+        : day.date?.toDate
+          ? day.date.toDate()
+          : new Date(day.date);
+      return (
+        dayDate.getMonth() === selectedMonthValue &&
+        dayDate.getFullYear() === selectedYear
+      );
     });
 
-    const allEntries = daysForDate.reduce((acc, day) => {
-      return [...acc, ...(day.entries || [])];
+    // Збираємо всі записи з інформацією про дату
+    const allEntries = daysForMonth.reduce((acc, day) => {
+      const dayDate = day.dateString
+        ? new Date(day.dateString)
+        : day.date?.toDate
+          ? day.date.toDate()
+          : new Date(day.date);
+
+      const entriesWithDate = (day.entries || []).map((entry) => ({
+        ...entry,
+        date: dayDate,
+        dayId: day.id,
+      }));
+      return [...acc, ...entriesWithDate];
     }, []);
 
-    const totalPersonnel = daysForDate.reduce((sum, day) => {
+    const totalPersonnel = daysForMonth.reduce((sum, day) => {
       return sum + (day.personnel || 0);
     }, 0);
 
     return {
       entries: allEntries,
       personnelAmount: totalPersonnel,
+      days: daysForMonth,
     };
-  }, [activeTab, personnelDays.days, selectedDate]);
+  }, [activeTab, personnelDays.days, selectedMonth]);
 
   // Обчислення поточного балансу
   const currentBalance = useMemo(() => {
@@ -115,30 +132,14 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     setActiveTab(tab);
   }, []);
 
-  const handleOpenModal = useCallback((day = null, type = "income") => {
-    setOperationType(type);
-
-    if (type === "personnel" && !day) {
-      setShowPersonnelModal(true);
-      return;
-    }
-
-    if (day) {
-      setEditingDay({
-        ...day,
-        dateString: day.date?.toDate
-          ? day.date.toDate().toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
-      });
-    } else {
-      setEditingDay(null);
-    }
+  const handleOpenModal = useCallback((entry = null) => {
+    setEditingEntry(entry);
     setShowModal(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
-    setEditingDay(null);
+    setEditingEntry(null);
   }, []);
 
   const handleClosePersonnelModal = useCallback(() => {
@@ -161,16 +162,22 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
       if (!result.isConfirmed) return;
 
       try {
-        const daysForDate = personnelDays.days.filter((day) => {
-          const dayDate =
-            day.dateString ||
-            (day.date?.toDate
-              ? day.date.toDate().toISOString().split("T")[0]
-              : new Date(day.date).toISOString().split("T")[0]);
-          return dayDate === selectedDate;
+        const selectedMonthValue = selectedMonth.getMonth();
+        const selectedYear = selectedMonth.getFullYear();
+
+        const daysForMonth = personnelDays.days.filter((day) => {
+          const dayDate = day.dateString
+            ? new Date(day.dateString)
+            : day.date?.toDate
+              ? day.date.toDate()
+              : new Date(day.date);
+          return (
+            dayDate.getMonth() === selectedMonthValue &&
+            dayDate.getFullYear() === selectedYear
+          );
         });
 
-        for (const day of daysForDate) {
+        for (const day of daysForMonth) {
           const entryToDelete = day.entries.find((e) => e.id === entryId);
           if (entryToDelete) {
             const updatedEntries = day.entries.filter((e) => e.id !== entryId);
@@ -207,35 +214,23 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         });
       }
     },
-    [personnelDays, personnelBalance, selectedDate],
+    [personnelDays, personnelBalance, selectedMonth],
   );
 
   const handleEditEntry = useCallback(
     async (entryId) => {
-      const daysForDate = personnelDays.days.filter((day) => {
-        const dayDate =
-          day.dateString ||
-          (day.date?.toDate
-            ? day.date.toDate().toISOString().split("T")[0]
-            : new Date(day.date).toISOString().split("T")[0]);
-        return dayDate === selectedDate;
-      });
+      // Знаходимо запис в filteredData
+      const entryToEdit = filteredData.entries.find((e) => e.id === entryId);
 
-      for (const day of daysForDate) {
-        const entry = day.entries.find((e) => e.id === entryId);
-        if (entry) {
-          handleOpenModal(
-            {
-              ...day,
-              entries: [entry],
-            },
-            "income",
-          );
-          break;
-        }
+      if (!entryToEdit) {
+        console.log("Entry not found in filteredData");
+        return;
       }
+
+      // Відкриваємо модалку з даними для редагування
+      handleOpenModal(entryToEdit);
     },
-    [personnelDays, selectedDate, handleOpenModal],
+    [filteredData.entries, handleOpenModal],
   );
 
   const handleSavePersonnel = useCallback(
@@ -264,61 +259,80 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     [personnelDays, personnelBalance, handleClosePersonnelModal],
   );
 
-  const handleSaveDay = useCallback(
-    async (dayData) => {
+  const handleMonthChange = useCallback((newMonth) => {
+    setSelectedMonth(newMonth);
+  }, []);
+
+  const handleSaveEntry = useCallback(
+    async (entryData) => {
       try {
-        if (editingDay) {
-          await activeDays.updateDay(editingDay.id, dayData);
-          Swal.fire({
-            icon: "success",
-            title: MESSAGES.SUCCESS.UPDATE,
-            showConfirmButton: false,
-            timer: 1500,
-          });
+        // Якщо редагуємо існуючий entry
+        if (entryData.id && entryData.dayId) {
+          const day = personnelDays.days.find((d) => d.id === entryData.dayId);
+          if (day) {
+            const updatedEntries = day.entries.map((e) =>
+              e.id === entryData.id
+                ? { ...e, name: entryData.name, amount: entryData.amount }
+                : e,
+            );
+            await personnelDays.updateDay(day.id, {
+              ...day,
+              entries: updatedEntries,
+            });
+          }
         } else {
-          const existingDay = activeDays.days.find((day) => {
+          // Створюємо новий entry
+          const existingDay = personnelDays.days.find((day) => {
             const dayDate =
               day.dateString ||
               (day.date?.toDate
                 ? day.date.toDate().toISOString().split("T")[0]
                 : new Date(day.date).toISOString().split("T")[0]);
-            return dayDate === dayData.dateString;
+            return dayDate === entryData.date;
           });
 
           if (existingDay) {
-            const updatedDayData = {
-              ...dayData,
-              entries: [...(existingDay.entries || []), ...dayData.entries],
-            };
-            await activeDays.updateDay(existingDay.id, updatedDayData);
+            // Додаємо entry до існуючого дня
+            const updatedEntries = [
+              ...(existingDay.entries || []),
+              { name: entryData.name, amount: entryData.amount },
+            ];
+            await personnelDays.updateDay(existingDay.id, {
+              ...existingDay,
+              entries: updatedEntries,
+            });
           } else {
-            await activeDays.createDay(dayData);
+            // Створюємо новий день з entry
+            await personnelDays.createDay({
+              dateString: entryData.date,
+              entries: [{ name: entryData.name, amount: entryData.amount }],
+              personnel: 0,
+            });
           }
-
-          Swal.fire({
-            icon: "success",
-            title: MESSAGES.SUCCESS.SAVE,
-            showConfirmButton: false,
-            timer: 1500,
-          });
         }
 
+        Swal.fire({
+          icon: "success",
+          title: entryData.id ? "Запис оновлено" : "Запис додано",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
         await Promise.all([
-          activeBalance.loadBalance(),
-          activeDays.loadDays(true),
+          personnelBalance.loadBalance(),
+          personnelDays.loadDays(true),
         ]);
-        handleCloseModal();
       } catch (error) {
-        console.error("Помилка збереження дня:", error);
+        console.error("Помилка збереження:", error);
         Swal.fire({
           icon: "error",
           title: "Помилка",
-          text: editingDay ? MESSAGES.ERRORS.UPDATE : MESSAGES.ERRORS.SAVE,
+          text: "Не вдалося зберегти запис",
           confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
         });
       }
     },
-    [editingDay, activeDays, activeBalance, handleCloseModal],
+    [personnelDays, personnelBalance],
   );
 
   // Loading state
@@ -354,44 +368,39 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
 
       <TabSwitcher activeTab={activeTab} onTabChange={handleTabChange} />
 
-      <MonthlyStats
-        days={activeDays.days}
-        currentBalance={currentBalance}
-        type={activeTab}
-      />
+      <div className="stats-and-actions-container">
+        <MonthlyStats
+          days={activeDays.days}
+          currentBalance={currentBalance}
+          type={activeTab}
+          selectedMonth={selectedMonth}
+          onMonthChange={handleMonthChange}
+        />
+
+        {activeTab === "personnel" && (
+          <div className="action-buttons-container">
+            <StyledButton
+              variant="secondary"
+              size="medium"
+              startIcon={<AddIcon />}
+              onClick={() => setShowPersonnelModal(true)}
+            >
+              Додати персоналу
+            </StyledButton>
+            <StyledButton
+              variant="primary"
+              size="medium"
+              startIcon={<AddIcon />}
+              onClick={() => handleOpenModal(null)}
+            >
+              Додати загальне
+            </StyledButton>
+          </div>
+        )}
+      </div>
 
       {activeTab === "personnel" ? (
         <div className="personnel-section">
-          <div className="date-selector">
-            <div className="date-group">
-              <label htmlFor="date-select">Оберіть дату:</label>
-              <input
-                id="date-select"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="date-input"
-              />
-            </div>
-            <div className="action-group">
-              <StyledButton
-                variant="secondary"
-                size="medium"
-                startIcon={<AddIcon />}
-                onClick={() => handleOpenModal(null, "personnel")}
-              >
-                Додати персоналу
-              </StyledButton>
-              <StyledButton
-                variant="primary"
-                size="medium"
-                startIcon={<AddIcon />}
-                onClick={() => handleOpenModal(null, "income")}
-              >
-                Додати загальне
-              </StyledButton>
-            </div>
-          </div>
           <EntriesTable
             entries={filteredData.entries}
             personnelAmount={filteredData.personnelAmount}
@@ -440,14 +449,11 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         </div>
       )}
 
-      <AddDayModal
+      <EntryModal
         isOpen={showModal}
         onClose={handleCloseModal}
-        onSave={handleSaveDay}
-        editingDay={editingDay}
-        activeTab={activeTab}
-        selectedDate={selectedDate}
-        operationType={operationType}
+        onSave={handleSaveEntry}
+        editingEntry={editingEntry}
         doctorName={selectedDoctor}
       />
 
@@ -455,7 +461,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         isOpen={showPersonnelModal}
         onClose={handleClosePersonnelModal}
         onSave={handleSavePersonnel}
-        selectedDate={selectedDate}
+        selectedDate={new Date().toISOString().split("T")[0]}
       />
     </div>
   );

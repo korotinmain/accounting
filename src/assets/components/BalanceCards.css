@@ -279,28 +279,35 @@
 @media (max-width: 768px) {
   .balance-cards {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 16px;
   }
 
   .balance-card {
-    padding: 16px;
+    padding: 12px 14px;
+  }
+
+  .balance-card-header {
+    margin-bottom: 10px;
+    gap: 8px;
   }
 
   .balance-card-icon {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
   }
 
   .balance-card-icon svg {
-    font-size: 1.2em;
+    font-size: 1.1em;
   }
 
   .balance-card-title {
-    font-size: 0.8em;
+    font-size: 0.75em;
   }
 
   .balance-card-amount {
-    font-size: 1.6em;
+    font-size: 1.5em;
+    margin-bottom: 6px;
   }
 
   .balance-currency {
@@ -308,7 +315,12 @@
   }
 
   .balance-card-trend {
-    font-size: 0.8em;
+    font-size: 0.75em;
+  }
+
+  .balance-trend {
+    gap: 4px;
+    margin-top: 4px;
   }
 
   .btn-edit-balance {
@@ -346,12 +358,35 @@
 
 /* Responsive Small Mobile */
 @media (max-width: 480px) {
+  .balance-cards {
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
   .balance-card {
-    padding: 14px;
+    padding: 10px 12px;
+  }
+
+  .balance-card-header {
+    margin-bottom: 8px;
+  }
+
+  .balance-card-icon {
+    width: 28px;
+    height: 28px;
   }
 
   .balance-card-amount {
-    font-size: 1.4em;
+    font-size: 1.3em;
+    margin-bottom: 4px;
+  }
+
+  .balance-card-trend {
+    font-size: 0.7em;
+  }
+
+  .balance-trend {
+    margin-top: 2px;
   }
 
   .btn-edit-balance svg {

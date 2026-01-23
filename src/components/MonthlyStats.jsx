@@ -3,24 +3,33 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { formatCurrency } from "../utils/formatters";
 import { Card } from "./common";
 import "../assets/components/MonthlyStats.css";
 
 /**
- * Компонент місячної статистики - показує дані за поточний місяць
+ * Компонент місячної статистики - показує дані за вибраний місяць
  * @param {Array} days - Масив днів
  * @param {number} currentBalance - Поточний баланс
  * @param {string} type - Тип (personnel/operational)
+ * @param {Date} selectedMonth - Вибраний місяць
+ * @param {function} onMonthChange - Callback для зміни місяця
  */
-const MonthlyStats = ({ days, currentBalance, type }) => {
-  // Отримуємо статистику за поточний місяць
+const MonthlyStats = ({
+  days,
+  currentBalance,
+  type,
+  selectedMonth,
+  onMonthChange,
+}) => {
+  // Отримуємо статистику за вибраний місяць
   const monthStats = useMemo(() => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
+    const selectedMonthValue = selectedMonth.getMonth();
+    const selectedYear = selectedMonth.getFullYear();
 
-    // Фільтруємо дні за поточний місяць
+    // Фільтруємо дні за вибраний місяць
     const monthDays = days.filter((day) => {
       const dayDate = day.dateString
         ? new Date(day.dateString)
@@ -29,8 +38,8 @@ const MonthlyStats = ({ days, currentBalance, type }) => {
           : new Date(day.date);
 
       return (
-        dayDate.getMonth() === currentMonth &&
-        dayDate.getFullYear() === currentYear
+        dayDate.getMonth() === selectedMonthValue &&
+        dayDate.getFullYear() === selectedYear
       );
     });
 
@@ -63,16 +72,69 @@ const MonthlyStats = ({ days, currentBalance, type }) => {
       netProfit,
       daysCount,
     };
-  }, [days, type]);
+  }, [days, type, selectedMonth]);
 
   // Назва місяця
-  const monthName = new Date().toLocaleDateString("uk-UA", {
+  const monthName = selectedMonth.toLocaleDateString("uk-UA", {
     month: "long",
     year: "numeric",
   });
 
+  // Функції для навігації по місяцях
+  const goToPreviousMonth = () => {
+    const newDate = new Date(selectedMonth);
+    newDate.setMonth(newDate.getMonth() - 1);
+    onMonthChange(newDate);
+  };
+
+  const goToNextMonth = () => {
+    const newDate = new Date(selectedMonth);
+    newDate.setMonth(newDate.getMonth() + 1);
+    onMonthChange(newDate);
+  };
+
+  const goToCurrentMonth = () => {
+    onMonthChange(new Date());
+  };
+
+  // Перевірка чи це поточний місяць
+  const isCurrentMonth = () => {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const selectedMonthValue = selectedMonth.getMonth();
+    const selectedYear = selectedMonth.getFullYear();
+
+    return currentMonth === selectedMonthValue && currentYear === selectedYear;
+  };
+
   return (
     <div className="monthly-stats-wrapper">
+      {/* Поточний залишок */}
+      <Card variant="elevated" className="current-balance-card">
+        <div className="balance-display">
+          <div className="balance-icon-large">
+            <AttachMoneyIcon />
+          </div>
+          <div className="balance-info">
+            <span className="balance-label">Поточний залишок</span>
+            <div className="balance-amount-large">
+              <span
+                className={`balance-value-large ${currentBalance >= 0 ? "positive" : "negative"}`}
+              >
+                {formatCurrency(currentBalance)}
+              </span>
+              <span className="balance-currency-large">грн</span>
+            </div>
+            <div
+              className={`balance-indicator ${currentBalance >= 0 ? "positive" : "negative"}`}
+            >
+              {currentBalance >= 0 ? "▲ Позитивний" : "▼ Негативний"}
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* Статистика за місяць */}
       <Card variant="elevated" className="monthly-stats-card main-stats">
         <div className="stats-header">
@@ -81,7 +143,28 @@ const MonthlyStats = ({ days, currentBalance, type }) => {
           </div>
           <div className="stats-title-group">
             <h3 className="stats-title">Статистика за місяць</h3>
-            <p className="stats-subtitle">{monthName}</p>
+            <div className="month-selector">
+              <button
+                className="month-nav-btn"
+                onClick={goToPreviousMonth}
+                aria-label="Попередній місяць"
+              >
+                <ArrowBackIosIcon />
+              </button>
+              <span className="stats-subtitle">{monthName}</span>
+              <button
+                className="month-nav-btn"
+                onClick={goToNextMonth}
+                aria-label="Наступний місяць"
+              >
+                <ArrowForwardIosIcon />
+              </button>
+            </div>
+            {!isCurrentMonth() && (
+              <button className="current-month-btn" onClick={goToCurrentMonth}>
+                Поточний місяць
+              </button>
+            )}
           </div>
         </div>
 
@@ -111,58 +194,6 @@ const MonthlyStats = ({ days, currentBalance, type }) => {
               <span className="stat-currency">грн</span>
             </div>
           </div>
-
-          <div className="stat-item days-stat">
-            <div className="stat-icon neutral">
-              <CalendarMonthIcon />
-            </div>
-            <div className="stat-content">
-              <span className="stat-label">Днів додано</span>
-              <span className="stat-value days-count">
-                {monthStats.daysCount}
-              </span>
-            </div>
-          </div>
-
-          <div className="stat-item profit-stat">
-            <div className="stat-icon profit">
-              <AttachMoneyIcon />
-            </div>
-            <div className="stat-content">
-              <span className="stat-label">Чистий прибуток</span>
-              <span
-                className={`stat-value ${monthStats.netProfit >= 0 ? "positive" : "negative"}`}
-              >
-                {monthStats.netProfit >= 0 ? "+" : ""}
-                {formatCurrency(monthStats.netProfit)}
-              </span>
-              <span className="stat-currency">грн</span>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Поточний баланс */}
-      <Card variant="elevated" className="monthly-stats-card balance-card">
-        <div className="balance-header">
-          <div className="balance-icon-wrapper">
-            <TrendingUpIcon />
-          </div>
-          <span className="balance-title">Поточний залишок</span>
-        </div>
-        <div className="balance-amount-display">
-          <span className="balance-value">
-            {formatCurrency(currentBalance)}
-          </span>
-          <span className="balance-currency-label">грн</span>
-        </div>
-        <div
-          className={`balance-status ${currentBalance >= 0 ? "positive" : "negative"}`}
-        >
-          <AttachMoneyIcon />
-          <span>
-            {currentBalance >= 0 ? "Позитивний баланс" : "Негативний баланс"}
-          </span>
         </div>
       </Card>
     </div>

@@ -1,19 +1,121 @@
 /* Monthly Statistics Styles */
 .monthly-stats-wrapper {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
   margin-bottom: 24px;
+}
+
+/* Current Balance Card */
+.current-balance-card {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 2px solid #86efac;
+  transition: all 0.3s ease;
+}
+
+.current-balance-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.balance-icon-large {
+  width: 64px;
+  height: 64px;
+  background: #10b981;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  flex-shrink: 0;
+}
+
+.balance-icon-large svg {
+  font-size: 36px;
+}
+
+.balance-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.balance-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balance-amount-large {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.balance-value-large {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.balance-value-large.positive {
+  color: #10b981;
+}
+
+.balance-value-large.negative {
+  color: #ef4444;
+}
+
+.balance-currency-large {
+  font-size: 18px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.balance-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.balance-indicator.positive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #059669;
+}
+
+.balance-indicator.negative {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
 }
 
 /* Main Stats Card */
 .monthly-stats-card {
   background: white;
   border-radius: 20px;
-  padding: 24px;
+  padding: 28px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   border: 2px solid #e2e8f0;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .monthly-stats-card:hover {
@@ -49,6 +151,9 @@
 
 .stats-title-group {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .stats-title {
@@ -58,12 +163,89 @@
   color: #1e293b;
 }
 
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.month-nav-btn {
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.month-nav-btn:hover {
+  background: white;
+  border-color: #6366f1;
+  color: #6366f1;
+  transform: scale(1.05);
+}
+
+.month-nav-btn:active {
+  transform: scale(0.95);
+}
+
+.month-nav-btn svg {
+  font-size: 16px;
+  display: block;
+}
+
+.month-nav-btn:first-child svg {
+  margin-left: 4px;
+}
+
 .stats-subtitle {
   margin: 0;
   font-size: 14px;
-  color: #64748b;
-  font-weight: 500;
+  color: #1e293b;
+  font-weight: 600;
   text-transform: capitalize;
+  min-width: 150px;
+  text-align: center;
+}
+
+.current-month-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 8px;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.current-month-btn::before {
+  content: "📅";
+  font-size: 14px;
+}
+
+.current-month-btn:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+.current-month-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.25);
 }
 
 /* Stats Grid */
@@ -120,6 +302,11 @@
   box-shadow: 0 4px 12px rgba(100, 116, 139, 0.2);
 }
 
+.stat-icon.balance {
+  background: #10b981;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
 .stat-icon.profit {
   background: #6366f1;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
@@ -168,96 +355,35 @@
   margin-left: 2px;
 }
 
-/* Balance Card */
-.balance-card {
-  display: flex;
-  flex-direction: column;
-  background: #f0fdf4 !important;
-  border-color: #86efac !important;
-}
-
-.balance-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.balance-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  background: #10b981;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-}
-
-.balance-icon-wrapper svg {
-  font-size: 24px;
-}
-
-.balance-title {
-  font-size: 13px;
-  font-weight: 600;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.balance-amount-display {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.balance-value {
-  font-size: 36px;
-  font-weight: 800;
-  color: #1e293b;
-  letter-spacing: -0.02em;
-}
-
-.balance-currency-label {
-  font-size: 16px;
-  font-weight: 600;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
-
-.balance-status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-top: auto;
-}
-
-.balance-status svg {
-  font-size: 18px;
-}
-
-.balance-status.positive {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-.balance-status.negative {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .monthly-stats-wrapper {
-    grid-template-columns: 1fr;
     gap: 12px;
+  }
+
+  .current-balance-card {
+    padding: 20px;
+  }
+
+  .balance-display {
+    gap: 16px;
+  }
+
+  .balance-icon-large {
+    width: 56px;
+    height: 56px;
+  }
+
+  .balance-icon-large svg {
+    font-size: 32px;
+  }
+
+  .balance-value-large {
+    font-size: 36px;
+  }
+
+  .balance-currency-large {
+    font-size: 16px;
   }
 
   .stats-grid {
@@ -276,13 +402,36 @@
   .stat-value {
     font-size: 18px;
   }
-
-  .balance-value {
-    font-size: 28px;
-  }
 }
 
 @media (max-width: 480px) {
+  .current-balance-card {
+    padding: 16px;
+  }
+
+  .balance-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .balance-icon-large {
+    width: 48px;
+    height: 48px;
+  }
+
+  .balance-icon-large svg {
+    font-size: 28px;
+  }
+
+  .balance-value-large {
+    font-size: 32px;
+  }
+
+  .balance-currency-large {
+    font-size: 14px;
+  }
+
   .monthly-stats-card {
     padding: 16px;
   }
@@ -290,6 +439,9 @@
   .stats-header {
     margin-bottom: 16px;
     padding-bottom: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .stats-icon-wrapper {
@@ -307,6 +459,20 @@
 
   .stats-subtitle {
     font-size: 13px;
+    min-width: 120px;
+  }
+
+  .month-selector {
+    gap: 8px;
+  }
+
+  .month-nav-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .month-nav-btn svg {
+    font-size: 14px;
   }
 
   .stat-item {
@@ -315,9 +481,5 @@
 
   .stat-value {
     font-size: 16px;
-  }
-
-  .balance-value {
-    font-size: 24px;
   }
 }

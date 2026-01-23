@@ -43,10 +43,15 @@
 }
 
 .entries-table th:nth-child(2) {
+  width: 50px;
   padding-left: 8px;
 }
 
 .entries-table th:nth-child(3) {
+  padding-left: 8px;
+}
+
+.entries-table th:nth-child(4) {
   text-align: right;
   padding-right: 8px;
 }
@@ -89,13 +94,21 @@
   display: none;
 }
 
+.entry-date {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 12px;
+  padding: 22px 6px 22px 8px !important;
+  white-space: nowrap;
+}
+
 .entry-name {
   margin: 0;
   display: flex;
   align-items: center;
   gap: 6px;
   font-weight: 500;
-  padding: 22px 6px 22px 8px !important;
+  padding: 22px 6px !important;
   overflow: hidden;
   text-overflow: ellipsis;
   height: 100%;
@@ -217,6 +230,14 @@
     font-size: 13px;
   }
 
+  .entries-table th:nth-child(2) {
+    width: 80px;
+  }
+
+  .entry-date {
+    font-size: 13px;
+  }
+
   .entry-amount {
     font-size: 15px;
   }
@@ -235,12 +256,12 @@
     text-align: center;
   }
 
-  .personnel-row td {
+  .personnel-item-row td {
     padding: 16px 12px;
     font-size: 15px;
   }
 
-  .personnel-amount {
+  .personnel-item-amount {
     font-size: 17px;
   }
 
@@ -267,8 +288,16 @@
     padding: 16px;
   }
 
+  .entries-table th:nth-child(2) {
+    width: 100px;
+  }
+
   .entries-table th:last-child {
     width: 150px;
+  }
+
+  .entry-date {
+    font-size: 14px;
   }
 
   .entry-name {

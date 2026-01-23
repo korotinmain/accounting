@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./assets/App.css";
+import "./assets/components/StatsAndActions.css";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 
