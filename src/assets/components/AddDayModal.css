@@ -34,6 +34,7 @@
   width: calc(100% - 32px);
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: var(--shadow-2xl);
   position: relative;
   margin: 16px auto;
@@ -351,6 +352,9 @@
 .form-group {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .form-group label {
@@ -376,6 +380,7 @@
   appearance: none;
   box-sizing: border-box;
   max-width: 100%;
+  min-width: 0;
 }
 
 .form-group select {
