@@ -2,14 +2,16 @@ import React from "react";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import SettingsIcon from "@mui/icons-material/Settings";
 import "./Header.css";
 
 /**
  * Компонент заголовку додатку
  * @param {string} doctorName - Ім'я вибраного лікаря
  * @param {function} onLogout - Callback для виходу
+ * @param {function} onSettings - Callback для відкриття налаштувань
  */
-const Header = ({ doctorName, onLogout }) => {
+const Header = ({ doctorName, onLogout, onSettings }) => {
   return (
     <header className="app-header">
       <div className="header-content">
@@ -27,9 +29,18 @@ const Header = ({ doctorName, onLogout }) => {
             <PersonIcon className="user-icon" />
             <span className="user-name">{doctorName}</span>
           </div>
-          <button className="logout-btn" onClick={onLogout} title="Вийти">
-            <LogoutIcon />
-          </button>
+          <div className="header-actions">
+            <button
+              className="settings-btn"
+              onClick={onSettings}
+              title="Налаштування"
+            >
+              <SettingsIcon />
+            </button>
+            <button className="logout-btn" onClick={onLogout} title="Вийти">
+              <LogoutIcon />
+            </button>
+          </div>
         </div>
       )}
     </header>
