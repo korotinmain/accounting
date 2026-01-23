@@ -1,4 +1,6 @@
 import React from "react";
+import Button from "@mui/material/Button";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -58,22 +60,28 @@ class ErrorBoundary extends React.Component {
             >
               Виникла неочікувана помилка. Будь ласка, оновіть сторінку.
             </p>
-            <button
+            <Button
+              variant="contained"
+              startIcon={<RefreshIcon />}
               onClick={() => window.location.reload()}
-              style={{
+              sx={{
                 padding: "12px 32px",
-                background: "#6366f1",
-                color: "white",
-                border: "none",
-                borderRadius: "12px",
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 fontSize: "1em",
                 fontWeight: "600",
-                cursor: "pointer",
+                borderRadius: "12px",
+                textTransform: "none",
                 boxShadow: "0 4px 6px -1px rgba(99, 102, 241, 0.3)",
+                "&:hover": {
+                  background:
+                    "linear-gradient(135deg, #5568d3 0%, #653a8b 100%)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "0 8px 16px -4px rgba(99, 102, 241, 0.4)",
+                },
               }}
             >
               Оновити сторінку
-            </button>
+            </Button>
             {process.env.NODE_ENV === "development" && this.state.error && (
               <details style={{ marginTop: "24px", textAlign: "left" }}>
                 <summary style={{ cursor: "pointer", color: "#6366f1" }}>

@@ -2,18 +2,19 @@ import React, { useState, useCallback, useMemo } from "react";
 import Modal from "react-modal";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import DescriptionIcon from "@mui/icons-material/Description";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
 import Swal from "sweetalert2";
+import StyledButton from "./StyledButton";
+import { EntryForm, EntryList, ModalSummary } from "./modal-parts";
+import { FormInput } from "./common";
 import { SWAL_CONFIG, MESSAGES } from "../constants";
 import {
   validateRequired,
   validateNumber,
   sanitizeNumber,
 } from "../utils/validation";
-import { formatCurrency } from "../utils/formatters";
 import { getTodayString } from "../utils/dateUtils";
 import "./AddDayModal.css";
 
@@ -234,20 +235,20 @@ const AddDayModal = ({
               ? "Додати суму персоналу"
               : "Додати до загального"}
         </h3>
-        <button
-          className="modal-close"
+        <StyledButton
+          iconOnly
+          variant="text"
           onClick={handleClose}
-          aria-label="Закрити"
+          title="Закрити"
         >
           <CloseIcon />
-        </button>
+        </StyledButton>
       </div>
 
       <div className="modal-body">
         {isSimpleIncomeMode ? (
           /* Спрощений інтерфейс для "Додати загальне" */
           <>
-            {/* ПІБ як інформація */}
             {doctorName && (
               <div className="form-group" style={{ marginBottom: "20px" }}>
                 <label style={{ color: "#6b7280", fontWeight: "500" }}>
@@ -271,79 +272,69 @@ const AddDayModal = ({
               </div>
             )}
 
-            {/* Дата */}
-            <div className="form-group" style={{ marginBottom: "20px" }}>
-              <label htmlFor="date-input">Дата</label>
-              <input
-                id="date-input"
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                aria-label="Дата"
-              />
+            <FormInput
+              label="Дата"
+              id="date-input"
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="mb-lg"
+            />
+
+            <FormInput
+              label="Сума"
+              id="amount-input"
+              type="number"
+              value={newAmount}
+              onChange={(e) => setNewAmount(e.target.value)}
+              placeholder="0"
+              className="mb-lg"
+            />
+
+            <div className="quick-amounts mb-lg">
+              {[250, 500, 750, 1000].map((amount) => (
+                <StyledButton
+                  key={amount}
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setNewAmount(amount.toString())}
+                >
+                  {amount}
+                </StyledButton>
+              ))}
             </div>
 
-            {/* Сума */}
-            <div className="form-group" style={{ marginBottom: "20px" }}>
-              <label htmlFor="amount-input">Сума</label>
-              <input
-                id="amount-input"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                value={newAmount}
-                onChange={(e) => setNewAmount(e.target.value)}
-                placeholder="0"
-                aria-label="Сума"
-                style={{ fontSize: "1.1em" }}
-              />
-              <div className="quick-amounts" style={{ marginTop: "12px" }}>
-                {[250, 500, 750, 1000].map((amount) => (
-                  <button
-                    key={amount}
-                    type="button"
-                    className="quick-amount-btn"
-                    onClick={() => setNewAmount(amount.toString())}
-                  >
-                    {amount}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Кнопки дій */}
-            <div className="modal-actions" style={{ marginTop: "30px" }}>
-              <button
-                className="btn btn-secondary btn-cancel"
+            <div className="modal-actions">
+              <StyledButton
+                variant="outlined"
+                size="large"
+                startIcon={<CloseIcon />}
                 onClick={handleClose}
               >
-                <CloseIcon style={{ fontSize: "1.1em" }} />
                 Скасувати
-              </button>
-              <button
-                className="btn btn-primary btn-save"
+              </StyledButton>
+              <StyledButton
+                variant="success"
+                size="large"
+                startIcon={<AddCircleIcon />}
                 onClick={handleSave}
                 disabled={!newAmount.trim()}
               >
-                <AddCircleIcon style={{ fontSize: "1.1em" }} />
                 Додати
-              </button>
+              </StyledButton>
             </div>
           </>
         ) : (
-          /* Звичайний інтерфейс для інших режимів */
+          /* Звичайний інтерфейс */
           <>
-            {/* Дата */}
-            <div className="form-group" style={{ marginBottom: "25px" }}>
-              <label htmlFor="date-input">Дата</label>
-              <input
-                id="date-input"
-                type="date"
-                value={newDate}
-                onChange={(e) => setNewDate(e.target.value)}
-                aria-label="Дата"
-              />
-            </div>
+            <FormInput
+              label="Дата"
+              id="date-input"
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="mb-xl"
+            />
 
             {/* Таби для операційної */}
             {activeTab === "operational" && (
@@ -371,250 +362,72 @@ const AddDayModal = ({
 
             {/* Summary панель */}
             {(currentEntries.length > 0 || currentWithdrawals.length > 0) && (
-              <div className="modal-summary">
-                <div className="summary-stats">
-                  {currentEntries.length > 0 && (
-                    <div className="summary-item deposits">
-                      <div className="summary-label">
-                        <AddCircleIcon style={{ fontSize: "0.9em" }} />
-                        Поклали
-                      </div>
-                      <div className="summary-value">
-                        +{formatCurrency(totalDeposits)} грн
-                      </div>
-                      <div className="summary-count">
-                        {currentEntries.length} записів
-                      </div>
-                    </div>
-                  )}
-                  {activeTab === "operational" &&
-                    currentWithdrawals.length > 0 && (
-                      <div className="summary-item withdrawals">
-                        <div className="summary-label">
-                          <RemoveCircleIcon style={{ fontSize: "0.9em" }} />
-                          Зняли
-                        </div>
-                        <div className="summary-value">
-                          -{formatCurrency(totalWithdrawals)} грн
-                        </div>
-                        <div className="summary-count">
-                          {currentWithdrawals.length} записів
-                        </div>
-                      </div>
-                    )}
-                </div>
-                {activeTab === "operational" &&
-                  currentWithdrawals.length > 0 && (
-                    <div className="summary-balance">
-                      <span>Баланс:</span>
-                      <span
-                        className={modalBalance >= 0 ? "positive" : "negative"}
-                      >
-                        {modalBalance >= 0 ? "+" : ""}
-                        {formatCurrency(modalBalance)} грн
-                      </span>
-                    </div>
-                  )}
-              </div>
+              <ModalSummary
+                totalDeposits={totalDeposits}
+                totalWithdrawals={totalWithdrawals}
+                balance={modalBalance}
+              />
             )}
 
-            {/* Заголовок форми */}
-            <h4
-              style={{
-                marginBottom: "15px",
-                color:
-                  activeTab === "operational" && modalTab === "withdrawals"
-                    ? "#ef4444"
-                    : "#10b981",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              {activeTab === "operational" ? (
-                modalTab === "withdrawals" ? (
-                  <>
-                    <RemoveCircleIcon style={{ fontSize: "1.1em" }} />
-                    Зняли кошти
-                  </>
-                ) : (
-                  <>
-                    <AddCircleIcon style={{ fontSize: "1.1em" }} />
-                    Додали кошти
-                  </>
-                )
-              ) : (
-                <>
-                  <DescriptionIcon style={{ fontSize: "1.1em" }} />
-                  Записи (ПІБ + сума)
-                </>
-              )}
-            </h4>
-
             {/* Форма вводу */}
-            <div className="entry-form">
-              <div className="form-group">
-                <label htmlFor="person-name">ПІБ</label>
-                <input
-                  id="person-name"
-                  type="text"
-                  value={newPersonName}
-                  onChange={(e) => setNewPersonName(e.target.value)}
-                  placeholder="Введіть ПІБ"
-                  aria-label="ПІБ особи"
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="amount-input">Сума</label>
-                <input
-                  id="amount-input"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={newAmount}
-                  onChange={(e) => setNewAmount(e.target.value)}
-                  placeholder="0"
-                  aria-label="Сума"
-                />
-                <div className="quick-amounts">
-                  {[100, 200, 500, 1000].map((amount) => (
-                    <button
-                      key={amount}
-                      type="button"
-                      className="quick-amount-btn"
-                      onClick={() => setNewAmount(amount.toString())}
-                    >
-                      {amount}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Кнопка додавання */}
-            <button
-              className={
-                activeTab === "operational" && modalTab === "withdrawals"
-                  ? "btn btn-danger"
-                  : "btn btn-primary"
-              }
-              onClick={handleAddEntry}
-              disabled={!newPersonName.trim() || !newAmount.trim()}
-            >
-              {activeTab === "operational" && modalTab === "withdrawals" ? (
-                <>
-                  <RemoveCircleIcon
-                    style={{ fontSize: "1em", marginRight: "6px" }}
-                  />
-                  Додати зняття
-                </>
-              ) : (
-                <>
-                  <AddCircleIcon
-                    style={{ fontSize: "1em", marginRight: "6px" }}
-                  />
-                  Додати запис
-                </>
-              )}
-            </button>
+            <EntryForm
+              personName={newPersonName}
+              amount={newAmount}
+              onPersonNameChange={(e) => setNewPersonName(e.target.value)}
+              onAmountChange={(e) => setNewAmount(e.target.value)}
+              onAddEntry={handleAddEntry}
+              quickAmounts={[100, 200, 500, 1000]}
+              entryType={modalTab}
+            />
 
             {/* Список поклали */}
             {currentEntries.length > 0 && (
-              <div className="entries-list">
-                <h4
-                  style={{
-                    color: "#10b981",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <AddCircleIcon style={{ fontSize: "1em" }} />
+              <div className="entries-section">
+                <h4 className="entries-section-title success">
+                  <AddCircleIcon />
                   Поклали:
                 </h4>
-                {currentEntries.map((entry, index) => (
-                  <div key={`${entry.name}-${index}`} className="entry-item">
-                    <div className="entry-info">
-                      <div className="entry-name">
-                        <PersonIcon
-                          style={{ fontSize: "1em", marginRight: "6px" }}
-                        />
-                        {entry.name}
-                      </div>
-                      <div className="entry-amount">
-                        {formatCurrency(entry.amount)} грн
-                      </div>
-                    </div>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRemoveEntry(index)}
-                      aria-label={`Видалити запис ${entry.name}`}
-                    >
-                      Видалити
-                    </button>
-                  </div>
-                ))}
+                <EntryList
+                  entries={currentEntries}
+                  onDeleteEntry={handleRemoveEntry}
+                  emptyMessage="Немає записів"
+                />
               </div>
             )}
 
             {/* Список зняли */}
             {activeTab === "operational" && currentWithdrawals.length > 0 && (
-              <div className="entries-list withdrawals-list">
-                <h4
-                  style={{
-                    color: "#ef4444",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                  }}
-                >
-                  <RemoveCircleIcon style={{ fontSize: "1em" }} />
+              <div className="entries-section">
+                <h4 className="entries-section-title danger">
+                  <RemoveCircleIcon />
                   Зняли:
                 </h4>
-                {currentWithdrawals.map((entry, index) => (
-                  <div
-                    key={`withdrawal-${entry.name}-${index}`}
-                    className="entry-item"
-                  >
-                    <div className="entry-info">
-                      <div className="entry-name">
-                        <PersonIcon
-                          style={{ fontSize: "1em", marginRight: "6px" }}
-                        />
-                        {entry.name}
-                      </div>
-                      <div
-                        className="entry-amount"
-                        style={{ color: "#ef4444" }}
-                      >
-                        -{formatCurrency(entry.amount)} грн
-                      </div>
-                    </div>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRemoveWithdrawal(index)}
-                      aria-label={`Видалити запис ${entry.name}`}
-                    >
-                      Видалити
-                    </button>
-                  </div>
-                ))}
+                <EntryList
+                  entries={currentWithdrawals}
+                  onDeleteEntry={handleRemoveWithdrawal}
+                  emptyMessage="Немає записів"
+                />
               </div>
             )}
 
             {/* Кнопки дій */}
             <div className="modal-actions">
-              <button
-                className="btn btn-secondary btn-cancel"
+              <StyledButton
+                variant="outlined"
+                size="large"
+                startIcon={<CloseIcon />}
                 onClick={handleClose}
               >
-                <CloseIcon style={{ fontSize: "1.1em" }} />
                 Скасувати
-              </button>
-              <button className="btn btn-primary btn-save" onClick={handleSave}>
-                <SaveIcon style={{ fontSize: "1.1em" }} />
+              </StyledButton>
+              <StyledButton
+                variant="success"
+                size="large"
+                startIcon={<SaveIcon />}
+                onClick={handleSave}
+              >
                 {editingDay ? "Оновити день" : "Зберегти день"}
-              </button>
+              </StyledButton>
             </div>
           </>
         )}

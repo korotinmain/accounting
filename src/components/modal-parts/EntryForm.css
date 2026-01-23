@@ -1,0 +1,36 @@
+@import "../../styles/variables.css";
+
+.entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-lg);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+}
+
+.entry-form-input {
+  width: 100%;
+}
+
+.quick-amounts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.quick-amounts-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-600);
+  font-weight: var(--font-weight-medium);
+}
+
+.quick-amounts-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.entry-form-submit {
+  width: 100%;
+}

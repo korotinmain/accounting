@@ -2,6 +2,7 @@ import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatCurrency } from "../utils/formatters";
+import StyledButton from "./StyledButton";
 import "./EntriesTable.css";
 
 /**
@@ -61,16 +62,18 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
               </td>
               {onDelete && (
                 <td className="entry-actions">
-                  <button
-                    className="action-btn delete-btn"
+                  <StyledButton
+                    iconOnly
+                    variant="danger"
+                    size="small"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(entry, index);
                     }}
-                    aria-label="Видалити"
+                    title="Видалити"
                   >
                     <DeleteIcon />
-                  </button>
+                  </StyledButton>
                 </td>
               )}
             </tr>

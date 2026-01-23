@@ -6,6 +6,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { formatDate, formatCurrency } from "../utils/formatters";
+import StyledButton from "./StyledButton";
 import "./DayCard.css";
 
 /**
@@ -36,22 +37,24 @@ const DayCard = ({ day, activeTab, onEdit, onDelete }) => {
           {formatDate(day.date)}
         </div>
         <div className="day-actions-compact">
-          <button
-            className="btn-icon-compact btn-edit"
+          <StyledButton
+            iconOnly
+            variant="primary"
+            size="small"
             onClick={() => onEdit(day)}
-            aria-label="Редагувати день"
             title="Редагувати"
           >
-            <EditNoteIcon style={{ fontSize: "1.1em" }} />
-          </button>
-          <button
-            className="btn-icon-compact btn-delete"
+            <EditNoteIcon />
+          </StyledButton>
+          <StyledButton
+            iconOnly
+            variant="danger"
+            size="small"
             onClick={() => onDelete(day.id)}
-            aria-label="Видалити день"
             title="Видалити"
           >
-            <DeleteOutlineIcon style={{ fontSize: "1.1em" }} />
-          </button>
+            <DeleteOutlineIcon />
+          </StyledButton>
         </div>
       </div>
 

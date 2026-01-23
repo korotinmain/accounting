@@ -3,6 +3,7 @@ import Modal from "react-modal";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
+import StyledButton from "./StyledButton";
 import { SWAL_CONFIG } from "../constants";
 import {
   validateRequired,
@@ -78,13 +79,14 @@ const PersonnelModal = ({ isOpen, onClose, onSave, selectedDate }) => {
     >
       <div className="modal-header">
         <h3>Додати суму персоналу</h3>
-        <button
-          className="modal-close"
+        <StyledButton
+          iconOnly
+          variant="text"
           onClick={handleClose}
-          aria-label="Закрити"
+          title="Закрити"
         >
           <CloseIcon />
-        </button>
+        </StyledButton>
       </div>
 
       <div className="modal-body">
@@ -118,14 +120,22 @@ const PersonnelModal = ({ isOpen, onClose, onSave, selectedDate }) => {
       </div>
 
       <div className="modal-footer">
-        <button className="btn btn-secondary" onClick={handleClose}>
-          <CloseIcon style={{ fontSize: "1.1em", marginRight: "6px" }} />
+        <StyledButton
+          variant="outlined"
+          size="large"
+          startIcon={<CloseIcon />}
+          onClick={handleClose}
+        >
           Скасувати
-        </button>
-        <button className="btn btn-primary" onClick={handleSave}>
-          <SaveIcon style={{ fontSize: "1.1em", marginRight: "6px" }} />
+        </StyledButton>
+        <StyledButton
+          variant="success"
+          size="large"
+          startIcon={<SaveIcon />}
+          onClick={handleSave}
+        >
           Зберегти
-        </button>
+        </StyledButton>
       </div>
     </Modal>
   );

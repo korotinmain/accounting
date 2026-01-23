@@ -3,6 +3,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
+import StyledButton from "./StyledButton";
 import "./Header.css";
 
 /**
@@ -30,16 +31,22 @@ const Header = ({ doctorName, onLogout, onSettings }) => {
             <span className="user-name">{doctorName}</span>
           </div>
           <div className="header-actions">
-            <button
-              className="settings-btn"
+            <StyledButton
+              iconOnly
+              variant="primary"
               onClick={onSettings}
               title="Налаштування"
             >
               <SettingsIcon />
-            </button>
-            <button className="logout-btn" onClick={onLogout} title="Вийти">
+            </StyledButton>
+            <StyledButton
+              iconOnly
+              variant="danger"
+              onClick={onLogout}
+              title="Вийти"
+            >
               <LogoutIcon />
-            </button>
+            </StyledButton>
           </div>
         </div>
       )}

@@ -85,37 +85,25 @@
   gap: 8px;
 }
 
-.settings-btn,
-.logout-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  background: rgba(255, 255, 255, 0.2);
+/* Стилі для StyledButton в хедері */
+.header-actions .styled-icon-button {
+  background: rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
-.settings-btn:hover,
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+.header-actions .styled-icon-button:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+  transform: scale(1.08) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2) !important;
 }
 
-.settings-btn:active,
-.logout-btn:active {
-  transform: scale(0.95);
-}
-
-.settings-btn svg,
-.logout-btn svg {
+.header-actions .styled-icon-button svg {
   font-size: 1.3em;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 /* Responsive */

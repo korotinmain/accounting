@@ -16,6 +16,7 @@ import AddDayModal from "../components/AddDayModal";
 import PersonnelModal from "../components/PersonnelModal";
 import LoadingState from "../components/LoadingState";
 import EntriesTable from "../components/EntriesTable";
+import StyledButton from "../components/StyledButton";
 
 // Utils
 import { SWAL_CONFIG, MESSAGES } from "../constants";
@@ -378,20 +379,22 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
               />
             </div>
             <div className="action-group">
-              <button
-                className="btn btn-secondary btn-add-personnel"
+              <StyledButton
+                variant="secondary"
+                size="medium"
+                startIcon={<AddIcon />}
                 onClick={() => handleOpenModal(null, "personnel")}
               >
-                <AddIcon style={{ fontSize: "1.1em", marginRight: "6px" }} />
                 Додати персоналу
-              </button>
-              <button
-                className="btn btn-primary btn-add-income"
+              </StyledButton>
+              <StyledButton
+                variant="primary"
+                size="medium"
+                startIcon={<AddIcon />}
                 onClick={() => handleOpenModal(null, "income")}
               >
-                <AddIcon style={{ fontSize: "1.1em", marginRight: "6px" }} />
                 Додати загальне
-              </button>
+              </StyledButton>
             </div>
           </div>
           <EntriesTable
@@ -403,13 +406,14 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         </div>
       ) : (
         <div className="days-section">
-          <button
-            className="btn btn-primary btn-add-day"
+          <StyledButton
+            variant="primary"
+            size="large"
+            startIcon={<AddIcon />}
             onClick={() => handleOpenModal()}
           >
-            <AddIcon style={{ fontSize: "1.2em", marginRight: "8px" }} />
             Додати новий день
-          </button>
+          </StyledButton>
           <h3 className="section-title">Всі записи</h3>
           {activeDays.days.length === 0 ? (
             <div className="empty-state">

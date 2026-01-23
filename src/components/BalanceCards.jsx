@@ -5,6 +5,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import { formatCurrency } from "../utils/formatters";
+import StyledButton from "./StyledButton";
+import { Card } from "./common";
 import "./BalanceCards.css";
 
 /**
@@ -35,22 +37,22 @@ const BalanceCards = ({
   return (
     <div className="balance-cards">
       {/* Початковий баланс */}
-      <div className="balance-card initial-balance">
+      <Card variant="elevated" className="balance-card initial-balance">
         <div className="balance-card-header">
           <div className="balance-card-icon">
             <AccountBalanceIcon />
           </div>
           <span className="balance-card-title">Початковий баланс</span>
           {!editingBalance && (
-            <button
-              className="btn-edit-balance"
+            <StyledButton
+              iconOnly
+              variant="text"
+              size="small"
               onClick={onStartEdit}
-              aria-label="Редагувати початковий баланс"
               title="Редагувати"
             >
-              <EditIcon style={{ fontSize: "1em" }} />
-              <span className="btn-text-mobile">Ред.</span>
-            </button>
+              <EditIcon />
+            </StyledButton>
           )}
         </div>
 
@@ -72,27 +74,29 @@ const BalanceCards = ({
               autoFocus
             />
             <div className="balance-edit-actions">
-              <button
-                className="btn btn-secondary btn-sm"
+              <StyledButton
+                variant="outlined"
+                size="small"
+                startIcon={<CloseIcon />}
                 onClick={onCancelEdit}
               >
-                <CloseIcon style={{ fontSize: "1em" }} />
-                <span>Скасувати</span>
-              </button>
-              <button
-                className="btn btn-primary btn-sm"
+                Скасувати
+              </StyledButton>
+              <StyledButton
+                variant="success"
+                size="small"
+                startIcon={<SaveIcon />}
                 onClick={onSaveBalance}
               >
-                <SaveIcon style={{ fontSize: "1em" }} />
-                <span>Зберегти</span>
-              </button>
+                Зберегти
+              </StyledButton>
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Поточний баланс */}
-      <div className="balance-card current-balance">
+      <Card variant="elevated" className="balance-card current-balance">
         <div className="balance-card-header">
           <div className="balance-card-icon current">
             <TrendingUpIcon />
@@ -115,7 +119,7 @@ const BalanceCards = ({
             {percentChange.toFixed(1)}%)
           </span>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

@@ -1,0 +1,224 @@
+/* Базові стилі для всіх кнопок */
+.styled-button {
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: none !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.styled-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.styled-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Primary кнопка - градієнт */
+.styled-button-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.styled-button-primary:hover {
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.styled-button-primary:active {
+  transform: translateY(0);
+}
+
+.styled-button-primary:disabled {
+  background: #cbd5e1 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Secondary кнопка - світлий варіант */
+.styled-button-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+  color: white !important;
+}
+
+.styled-button-secondary:hover {
+  box-shadow: 0 8px 24px rgba(245, 87, 108, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+.styled-button-secondary:active {
+  transform: translateY(0);
+}
+
+.styled-button-secondary:disabled {
+  background: #cbd5e1 !important;
+  color: #94a3b8 !important;
+}
+
+/* Outlined кнопка */
+.styled-button-outlined {
+  border: 2px solid #667eea !important;
+  color: #667eea !important;
+  background: transparent !important;
+}
+
+.styled-button-outlined:hover {
+  background: rgba(102, 126, 234, 0.08) !important;
+  border-color: #764ba2 !important;
+  transform: translateY(-2px);
+}
+
+.styled-button-outlined:disabled {
+  border-color: #cbd5e1 !important;
+  color: #94a3b8 !important;
+}
+
+/* Text кнопка */
+.styled-button-text {
+  color: #667eea !important;
+  background: transparent !important;
+}
+
+.styled-button-text:hover {
+  background: rgba(102, 126, 234, 0.08) !important;
+}
+
+/* Danger кнопка */
+.styled-button-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+  color: white !important;
+}
+
+.styled-button-danger:hover {
+  box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* Success кнопка */
+.styled-button-success {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+  color: white !important;
+}
+
+.styled-button-success:hover {
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* Розміри */
+.styled-button-small {
+  padding: 6px 16px !important;
+  font-size: 14px !important;
+}
+
+.styled-button-medium {
+  padding: 10px 24px !important;
+  font-size: 15px !important;
+}
+
+.styled-button-large {
+  padding: 14px 32px !important;
+  font-size: 16px !important;
+}
+
+/* Icon Button стилі */
+.styled-icon-button {
+  border-radius: 12px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.styled-icon-button-primary {
+  background: rgba(102, 126, 234, 0.1) !important;
+  color: #667eea !important;
+}
+
+.styled-icon-button-primary:hover {
+  background: rgba(102, 126, 234, 0.2) !important;
+  transform: scale(1.05);
+}
+
+.styled-icon-button-secondary {
+  background: rgba(245, 87, 108, 0.1) !important;
+  color: #f5576c !important;
+}
+
+.styled-icon-button-secondary:hover {
+  background: rgba(245, 87, 108, 0.2) !important;
+  transform: scale(1.05);
+}
+
+.styled-icon-button-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
+.styled-icon-button-danger:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+  transform: scale(1.05);
+}
+
+.styled-icon-button-text {
+  color: #64748b !important;
+}
+
+.styled-icon-button-text:hover {
+  background: rgba(100, 116, 139, 0.1) !important;
+}
+
+/* Кнопка назад */
+.btn-back-styled {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #667eea !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-back-styled:hover {
+  background: white !important;
+  transform: translateX(-4px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Анімація при завантаженні */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.styled-button:disabled {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .styled-button-large {
+    padding: 12px 24px !important;
+    font-size: 15px !important;
+  }
+
+  .styled-button-medium {
+    padding: 8px 20px !important;
+    font-size: 14px !important;
+  }
+}

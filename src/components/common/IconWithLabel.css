@@ -1,0 +1,62 @@
+@import "../../styles/variables.css";
+
+.icon-with-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+}
+
+.icon-with-label-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.icon-with-label-primary .icon-with-label-icon {
+  background: rgba(102, 126, 234, 0.1);
+  color: var(--color-primary);
+}
+
+.icon-with-label-secondary .icon-with-label-icon {
+  background: rgba(245, 87, 108, 0.1);
+  color: var(--color-secondary);
+}
+
+.icon-with-label-success .icon-with-label-icon {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-success);
+}
+
+.icon-with-label-danger .icon-with-label-icon {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+}
+
+.icon-with-label-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.icon-with-label-text {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-gray-900);
+}
+
+.icon-with-label-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.icon-with-label:hover {
+  background: var(--color-gray-50);
+}

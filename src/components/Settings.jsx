@@ -6,6 +6,8 @@ import PeopleIcon from "@mui/icons-material/People";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import { formatCurrency } from "../utils/formatters";
 import { useSettings } from "../hooks/useSettings";
+import StyledButton from "./StyledButton";
+import { FormInput, IconWithLabel } from "./common";
 import "./Settings.css";
 import LoadingState from "./LoadingState";
 
@@ -64,9 +66,15 @@ const Settings = ({ onBack }) => {
     <div className="settings-wrapper">
       <div className="settings-container">
         <div className="settings-header">
-          <button className="btn-back" onClick={onBack} aria-label="Назад">
-            <ArrowBackIcon />
-          </button>
+          <StyledButton
+            variant="outlined"
+            size="medium"
+            startIcon={<ArrowBackIcon />}
+            onClick={onBack}
+            className="btn-back-styled"
+          >
+            Назад
+          </StyledButton>
           <div className="settings-header-title">
             <SettingsIcon className="settings-icon" />
             <h1>Налаштування</h1>
@@ -83,52 +91,40 @@ const Settings = ({ onBack }) => {
             <div className="settings-form">
               {/* Баланс Персонал */}
               <div className="setting-item">
-                <div className="setting-item-header">
-                  <PeopleIcon className="setting-item-icon personnel-icon" />
-                  <div className="setting-label">
-                    <span className="setting-label-text">Персонал</span>
-                    <span className="setting-label-hint">
-                      Початковий баланс для розрахунків персоналу
-                    </span>
-                  </div>
-                </div>
-                <div className="setting-input-group">
-                  <input
-                    id="personnel-balance"
-                    type="text"
-                    value={personnelInput}
-                    onChange={handlePersonnelChange}
-                    className="setting-input"
-                    placeholder="0"
-                    disabled={saving}
-                  />
-                  <span className="setting-currency">грн</span>
-                </div>
+                <IconWithLabel
+                  icon={<PeopleIcon />}
+                  label="Персонал"
+                  description="Початковий баланс для розрахунків персоналу"
+                  variant="primary"
+                />
+                <FormInput
+                  id="personnel-balance"
+                  type="number"
+                  value={personnelInput}
+                  onChange={handlePersonnelChange}
+                  placeholder="0"
+                  disabled={saving}
+                  hint="грн"
+                />
               </div>
 
               {/* Баланс Операційна */}
               <div className="setting-item">
-                <div className="setting-item-header">
-                  <BusinessCenterIcon className="setting-item-icon operational-icon" />
-                  <div className="setting-label">
-                    <span className="setting-label-text">Операційна</span>
-                    <span className="setting-label-hint">
-                      Початковий баланс для операційних витрат
-                    </span>
-                  </div>
-                </div>
-                <div className="setting-input-group">
-                  <input
-                    id="operational-balance"
-                    type="text"
-                    value={operationalInput}
-                    onChange={handleOperationalChange}
-                    className="setting-input"
-                    placeholder="0"
-                    disabled={saving}
-                  />
-                  <span className="setting-currency">грн</span>
-                </div>
+                <IconWithLabel
+                  icon={<BusinessCenterIcon />}
+                  label="Операційна"
+                  description="Початковий баланс для операційних витрат"
+                  variant="secondary"
+                />
+                <FormInput
+                  id="operational-balance"
+                  type="number"
+                  value={operationalInput}
+                  onChange={handleOperationalChange}
+                  placeholder="0"
+                  disabled={saving}
+                  hint="грн"
+                />
               </div>
             </div>
 
@@ -155,14 +151,16 @@ const Settings = ({ onBack }) => {
 
             {/* Кнопка збереження */}
             <div className="settings-actions">
-              <button
-                className="btn-save-settings"
+              <StyledButton
+                variant="success"
+                size="large"
+                fullWidth
+                startIcon={<SaveIcon />}
                 onClick={handleSave}
                 disabled={saving}
               >
-                <SaveIcon />
                 {saving ? "Збереження..." : "Зберегти налаштування"}
-              </button>
+              </StyledButton>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
+import StyledButton from "./StyledButton";
 import "./TabSwitcher.css";
 
 /**
@@ -11,20 +12,26 @@ import "./TabSwitcher.css";
 const TabSwitcher = ({ activeTab, onTabChange }) => {
   return (
     <div className="tabs-container">
-      <button
-        className={`tab-button ${activeTab === "personnel" ? "active" : ""}`}
+      <StyledButton
+        variant={activeTab === "personnel" ? "primary" : "outlined"}
+        size="large"
+        fullWidth
+        startIcon={<GroupsIcon />}
         onClick={() => onTabChange("personnel")}
+        className="tab-button-styled"
       >
-        <GroupsIcon style={{ fontSize: "1.2em", marginRight: "8px" }} />
-        <span>Персонал</span>
-      </button>
-      <button
-        className={`tab-button ${activeTab === "operational" ? "active" : ""}`}
+        Персонал
+      </StyledButton>
+      <StyledButton
+        variant={activeTab === "operational" ? "primary" : "outlined"}
+        size="large"
+        fullWidth
+        startIcon={<BusinessCenterIcon />}
         onClick={() => onTabChange("operational")}
+        className="tab-button-styled"
       >
-        <BusinessCenterIcon style={{ fontSize: "1.2em", marginRight: "8px" }} />
-        <span>Операційна</span>
-      </button>
+        Операційна
+      </StyledButton>
     </div>
   );
 };
