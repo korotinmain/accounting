@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { db } from "../firebase";
+import { db } from "../api/firebase";
 import {
   collection,
   addDoc,
@@ -12,7 +12,7 @@ import {
   where,
 } from "firebase/firestore";
 import Swal from "sweetalert2";
-import { COLLECTIONS, SWAL_CONFIG, MESSAGES } from "../constants";
+import { COLLECTIONS, SWAL_CONFIG, MESSAGES } from "../utils/constants";
 import { parseDate } from "../utils/dateUtils";
 
 /**

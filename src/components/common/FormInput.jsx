@@ -1,5 +1,5 @@
 import React from "react";
-import "./FormInput.css";
+import "../../assets/components/FormInput.css";
 
 /**
  * Реюзабл компонент для інпутів форми

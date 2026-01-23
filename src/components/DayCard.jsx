@@ -7,7 +7,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { formatDate, formatCurrency } from "../utils/formatters";
 import StyledButton from "./StyledButton";
-import "./DayCard.css";
+import "../assets/components/DayCard.css";
 
 /**
  * Компонент картки дня

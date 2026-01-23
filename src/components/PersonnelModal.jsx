@@ -4,13 +4,13 @@ import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import Swal from "sweetalert2";
 import StyledButton from "./StyledButton";
-import { SWAL_CONFIG } from "../constants";
+import { SWAL_CONFIG } from "../utils/constants";
 import {
   validateRequired,
   validateNumber,
   sanitizeNumber,
 } from "../utils/validation";
-import "./PersonnelModal.css";
+import "../assets/components/PersonnelModal.css";
 
 /**
  * Модальне вікно для додавання суми персоналу

@@ -9,14 +9,14 @@ import Swal from "sweetalert2";
 import StyledButton from "./StyledButton";
 import { EntryForm, EntryList, ModalSummary } from "./modal-parts";
 import { FormInput } from "./common";
-import { SWAL_CONFIG, MESSAGES } from "../constants";
+import { SWAL_CONFIG, MESSAGES } from "../utils/constants";
 import {
   validateRequired,
   validateNumber,
   sanitizeNumber,
 } from "../utils/validation";
 import { getTodayString } from "../utils/dateUtils";
-import "./AddDayModal.css";
+import "../assets/components/AddDayModal.css";
 
 /**
  * Модальне вікно для додавання/редагування дня

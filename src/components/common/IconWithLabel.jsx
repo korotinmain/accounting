@@ -1,5 +1,5 @@
 import React from "react";
-import "./IconWithLabel.css";
+import "../../assets/components/IconWithLabel.css";
 
 /**
  * Компонент іконки з текстом

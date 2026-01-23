@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import "./App.css";
+import "./assets/App.css";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 
@@ -17,7 +17,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import DoctorGuard from "./routes/DoctorGuard";
 
 // Utils
-import { SWAL_CONFIG } from "./constants";
+import { SWAL_CONFIG } from "./utils/constants";
 
 // Встановлюю root для accessibility
 Modal.setAppElement("#root");

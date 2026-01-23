@@ -8,7 +8,7 @@ import { formatCurrency } from "../utils/formatters";
 import { useSettings } from "../hooks/useSettings";
 import StyledButton from "./StyledButton";
 import { FormInput, IconWithLabel } from "./common";
-import "./Settings.css";
+import "../assets/components/Settings.css";
 import LoadingState from "./LoadingState";
 
 /**

@@ -1,5 +1,5 @@
 import React from "react";
-import "./EntryList.css";
+import "../../assets/components/EntryList.css";
 import StyledButton from "../StyledButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatCurrency } from "../../utils/formatters";

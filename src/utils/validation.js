@@ -1,4 +1,4 @@
-import { VALIDATION } from "../constants";
+import { VALIDATION } from "./constants";
 
 export const validateNumber = (value) => {
   const num = parseFloat(value);

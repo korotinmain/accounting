@@ -24,10 +24,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #6366f1 0%, #8b5cf6 100%);
+  height: 4px;
+  background: #6366f1;
   opacity: 0;
   transition: opacity 0.3s ease;
+  border-radius: 16px 16px 0 0;
 }
 
 .balance-card:hover {
@@ -42,12 +43,12 @@
 }
 
 .balance-card.current-balance {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 1px solid #86efac;
+  background: #f0fdf4;
+  border: 2px solid #86efac;
 }
 
 .balance-card.current-balance::before {
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: #10b981;
 }
 
 .balance-card-header {
@@ -62,7 +63,7 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  background: #6366f1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,7 +72,7 @@
 }
 
 .balance-card-icon.current {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #10b981;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
 }
 

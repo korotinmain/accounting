@@ -1,5 +1,5 @@
 import React from "react";
-import "./ModalSummary.css";
+import "../../assets/components/ModalSummary.css";
 import { formatCurrency } from "../../utils/formatters";
 
 /**

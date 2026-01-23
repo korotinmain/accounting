@@ -1,5 +1,5 @@
 import React from "react";
-import "./EntryForm.css";
+import "../../assets/components/EntryForm.css";
 import StyledButton from "../StyledButton";
 import { FormInput } from "../common";
 

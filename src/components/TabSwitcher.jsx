@@ -2,7 +2,7 @@ import React from "react";
 import GroupsIcon from "@mui/icons-material/Groups";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import StyledButton from "./StyledButton";
-import "./TabSwitcher.css";
+import "../assets/components/TabSwitcher.css";
 
 /**
  * Компонент перемикача між вкладками Personnel та Operational

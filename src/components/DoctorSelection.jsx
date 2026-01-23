@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import "./DoctorSelection.css";
+import "../assets/components/DoctorSelection.css";
 
 const DOCTORS = [
   "Заброварна Т.М.",

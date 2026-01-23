@@ -1,5 +1,5 @@
 import React from "react";
-import "./LoadingState.css";
+import "../assets/components/LoadingState.css";
 
 /**
  * Компонент skeleton loading state

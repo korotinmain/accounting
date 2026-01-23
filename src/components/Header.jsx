@@ -4,7 +4,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
 import SettingsIcon from "@mui/icons-material/Settings";
 import StyledButton from "./StyledButton";
-import "./Header.css";
+import "../assets/components/Header.css";
 
 /**
  * Компонент заголовку додатку

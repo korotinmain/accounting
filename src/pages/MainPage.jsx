@@ -10,7 +10,7 @@ import { useDays } from "../hooks/useDays";
 // Components
 import Header from "../components/Header";
 import TabSwitcher from "../components/TabSwitcher";
-import BalanceCards from "../components/BalanceCards";
+import MonthlyStats from "../components/MonthlyStats";
 import DayCard from "../components/DayCard";
 import AddDayModal from "../components/AddDayModal";
 import PersonnelModal from "../components/PersonnelModal";
@@ -19,7 +19,7 @@ import EntriesTable from "../components/EntriesTable";
 import StyledButton from "../components/StyledButton";
 
 // Utils
-import { SWAL_CONFIG, MESSAGES } from "../constants";
+import { SWAL_CONFIG, MESSAGES } from "../utils/constants";
 
 /**
  * Головна сторінка додатку з управлінням фінансами
@@ -354,15 +354,10 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
 
       <TabSwitcher activeTab={activeTab} onTabChange={handleTabChange} />
 
-      <BalanceCards
-        initialBalance={activeBalance.initialBalance}
+      <MonthlyStats
+        days={activeDays.days}
         currentBalance={currentBalance}
-        editingBalance={activeBalance.editingBalance}
-        balanceInput={activeBalance.balanceInput}
-        onBalanceInputChange={activeBalance.setBalanceInput}
-        onStartEdit={activeBalance.startEdit}
-        onSaveBalance={activeBalance.saveBalance}
-        onCancelEdit={activeBalance.cancelEdit}
+        type={activeTab}
       />
 
       {activeTab === "personnel" ? (

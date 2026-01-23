@@ -7,7 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { formatCurrency } from "../utils/formatters";
 import StyledButton from "./StyledButton";
 import { Card } from "./common";
-import "./BalanceCards.css";
+import "../assets/components/BalanceCards.css";
 
 /**
  * Компонент карток балансу (початковий та поточний)

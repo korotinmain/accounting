@@ -1,7 +1,7 @@
 import React from "react";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import "./StyledButton.css";
+import "../assets/components/StyledButton.css";
 
 /**
  * Стилізована кнопка з використанням MUI

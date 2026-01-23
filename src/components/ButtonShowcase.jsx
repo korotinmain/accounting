@@ -6,7 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import SettingsIcon from "@mui/icons-material/Settings";
-import "./ButtonShowcase.css";
+import "../assets/components/ButtonShowcase.css";
 
 /**
  * Демонстраційна сторінка для всіх варіантів StyledButton

@@ -3,7 +3,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { formatCurrency } from "../utils/formatters";
 import StyledButton from "./StyledButton";
-import "./EntriesTable.css";
+import "../assets/components/EntriesTable.css";
 
 /**
  * Компонент таблиці записів грошей
