@@ -24,8 +24,8 @@ const DayCard = ({ day, activeTab, onEdit, onDelete }) => {
   if (activeTab === "operational") {
     finalTotal = totalDeposits - totalWithdrawals;
   } else {
-    // Для personnel: поклади мінус персонал
-    finalTotal = totalDeposits - (day.personnel || 0);
+    // Для personnel: тільки поклади
+    finalTotal = totalDeposits;
   }
 
   return (
@@ -116,16 +116,6 @@ const DayCard = ({ day, activeTab, onEdit, onDelete }) => {
               </div>
             </div>
           )}
-
-        {/* Персонал (тільки для personnel) */}
-        {activeTab === "personnel" && day.personnel > 0 && (
-          <div className="personnel-row-compact">
-            <span className="personnel-label-compact">Персонал:</span>
-            <span className="personnel-amount-compact">
-              -{formatCurrency(day.personnel)} грн
-            </span>
-          </div>
-        )}
       </div>
 
       <div className="day-footer-compact">

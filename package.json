@@ -15,7 +15,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:staging": "env-cmd -f .env.staging react-scripts start",
     "build": "react-scripts build",
+    "build:staging": "env-cmd -f .env.staging react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && firebase deploy",
@@ -25,6 +27,7 @@
     "firebase:use": "firebase use accounting-a2ac6"
   },
   "devDependencies": {
+    "env-cmd": "^11.0.0",
     "react-scripts": "5.0.1"
   },
   "eslintConfig": {
