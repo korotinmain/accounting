@@ -26,6 +26,8 @@
   color: var(--color-gray-900);
   background: var(--color-white);
   transition: all var(--transition-base);
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .form-input.has-icon {

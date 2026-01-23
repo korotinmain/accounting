@@ -141,31 +141,32 @@ const MonthlyStats = ({
           <div className="stats-icon-wrapper">
             <CalendarMonthIcon />
           </div>
-          <div className="stats-title-group">
-            <h3 className="stats-title">Статистика за місяць</h3>
-            <div className="month-selector">
-              <button
-                className="month-nav-btn"
-                onClick={goToPreviousMonth}
-                aria-label="Попередній місяць"
-              >
-                <ArrowBackIosIcon />
-              </button>
-              <span className="stats-subtitle">{monthName}</span>
-              <button
-                className="month-nav-btn"
-                onClick={goToNextMonth}
-                aria-label="Наступний місяць"
-              >
-                <ArrowForwardIosIcon />
-              </button>
-            </div>
-            {!isCurrentMonth() && (
-              <button className="current-month-btn" onClick={goToCurrentMonth}>
-                Поточний місяць
-              </button>
-            )}
+          <h3 className="stats-title">Статистика за місяць</h3>
+        </div>
+
+        <div className="month-selector-wrapper">
+          <div className="month-selector">
+            <button
+              className="month-nav-btn"
+              onClick={goToPreviousMonth}
+              aria-label="Попередній місяць"
+            >
+              <ArrowBackIosIcon />
+            </button>
+            <span className="stats-subtitle">{monthName}</span>
+            <button
+              className="month-nav-btn"
+              onClick={goToNextMonth}
+              aria-label="Наступний місяць"
+            >
+              <ArrowForwardIosIcon />
+            </button>
           </div>
+          {!isCurrentMonth() && (
+            <button className="current-month-btn" onClick={goToCurrentMonth}>
+              Поточний місяць
+            </button>
+          )}
         </div>
 
         <div className="stats-grid">

@@ -385,7 +385,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
               startIcon={<AddIcon />}
               onClick={() => setShowPersonnelModal(true)}
             >
-              Додати персоналу
+              Персоналу
             </StyledButton>
             <StyledButton
               variant="primary"
@@ -393,7 +393,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
               startIcon={<AddIcon />}
               onClick={() => handleOpenModal(null)}
             >
-              Додати загальне
+              Загальне
             </StyledButton>
           </div>
         )}

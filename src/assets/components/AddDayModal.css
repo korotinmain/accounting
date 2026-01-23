@@ -374,6 +374,8 @@
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .form-group select {
@@ -621,9 +623,12 @@
     font-size: 0.85em;
   }
 
-  .form-group input {
+  .form-group input,
+  .form-group select {
     padding: 12px 14px;
     font-size: 0.95em;
+    box-sizing: border-box;
+    max-width: 100%;
   }
 
   .add-day-button {
@@ -655,6 +660,7 @@
     padding: 16px;
     width: calc(100% - 16px);
     margin: 8px auto;
+    overflow-x: hidden;
   }
 
   .modal-summary {

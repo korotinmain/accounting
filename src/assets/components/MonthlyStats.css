@@ -128,9 +128,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid #f1f5f9;
+  margin-bottom: 20px;
 }
 
 .stats-icon-wrapper {
@@ -143,24 +141,29 @@
   justify-content: center;
   color: white;
   box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  flex-shrink: 0;
 }
 
 .stats-icon-wrapper svg {
   font-size: 28px;
 }
 
-.stats-title-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .stats-title {
-  margin: 0 0 4px 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 700;
   color: #1e293b;
+  flex: 1;
+}
+
+.month-selector-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
 }
 
 .month-selector {
@@ -213,6 +216,7 @@
   text-transform: capitalize;
   min-width: 150px;
   text-align: center;
+  flex: 1;
 }
 
 .current-month-btn {
@@ -225,7 +229,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-top: 8px;
   box-shadow: 0 2px 8px rgba(99, 102, 241, 0.25);
   display: inline-flex;
   align-items: center;
@@ -439,9 +442,6 @@
 
   .stats-header {
     margin-bottom: 16px;
-    padding-bottom: 12px;
-    flex-direction: column;
-    align-items: flex-start;
     gap: 12px;
   }
 
@@ -458,13 +458,22 @@
     font-size: 15px;
   }
 
-  .stats-subtitle {
-    font-size: 13px;
-    min-width: 120px;
+  .month-selector-wrapper {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
   }
 
   .month-selector {
     gap: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .stats-subtitle {
+    font-size: 13px;
+    min-width: auto;
+    flex: 0 0 auto;
+    padding: 0 8px;
   }
 
   .month-nav-btn {
@@ -474,6 +483,11 @@
 
   .month-nav-btn svg {
     font-size: 18px;
+  }
+
+  .current-month-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .stat-item {
