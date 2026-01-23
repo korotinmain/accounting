@@ -55,10 +55,26 @@ export const useDays = (type) => {
         );
 
         const snapshot = await getDocs(daysQuery);
-        const loadedDays = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+        const loadedDays = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          // Додаємо унікальні ID для кожного entry
+          const entriesWithIds = (data.entries || []).map((entry, index) => ({
+            ...entry,
+            id: entry.id || `${doc.id}-entry-${index}`,
+          }));
+          const withdrawalsWithIds = (data.withdrawals || []).map(
+            (withdrawal, index) => ({
+              ...withdrawal,
+              id: withdrawal.id || `${doc.id}-withdrawal-${index}`,
+            }),
+          );
+          return {
+            id: doc.id,
+            ...data,
+            entries: entriesWithIds,
+            withdrawals: withdrawalsWithIds,
+          };
+        });
 
         setDays(loadedDays);
         setError(null);

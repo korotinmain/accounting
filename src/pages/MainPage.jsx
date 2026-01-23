@@ -292,17 +292,22 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           });
 
           if (existingDay) {
-            // Додаємо entry до існуючого дня
+            // Додаємо entry до існуючого дня з унікальним ID
+            const newEntryId = `${existingDay.id}-entry-${(existingDay.entries || []).length}`;
             const updatedEntries = [
               ...(existingDay.entries || []),
-              { name: entryData.name, amount: entryData.amount },
+              {
+                id: newEntryId,
+                name: entryData.name,
+                amount: entryData.amount,
+              },
             ];
             await personnelDays.updateDay(existingDay.id, {
               ...existingDay,
               entries: updatedEntries,
             });
           } else {
-            // Створюємо новий день з entry
+            // Створюємо новий день з entry (ID буде додано після створення дня)
             await personnelDays.createDay({
               dateString: entryData.date,
               entries: [{ name: entryData.name, amount: entryData.amount }],

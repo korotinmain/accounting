@@ -48,7 +48,7 @@ const EntriesTable = ({ entries, personnelAmount = 0, onEdit, onDelete }) => {
         <tbody>
           {entries.map((entry, index) => (
             <tr
-              key={`entry-${index}`}
+              key={entry.id || `entry-${index}`}
               onClick={(e) => {
                 // Не викликати onEdit якщо клікнули на кнопку видалення
                 if (

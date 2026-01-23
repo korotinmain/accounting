@@ -94,7 +94,7 @@ const EntryModal = ({
 
     const sanitizedAmount = sanitizeNumber(amount);
     const entryData = {
-      name: personName.trim() || doctorName,
+      name: editingEntry ? personName.trim() : personName.trim() || doctorName,
       amount: sanitizedAmount,
       date: date,
       ...(editingEntry && { id: editingEntry.id, dayId: editingEntry.dayId }),
