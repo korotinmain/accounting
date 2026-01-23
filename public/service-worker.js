@@ -1,14 +1,9 @@
 /* eslint-disable no-restricted-globals */
 
-const CACHE_NAME = "accounting-app-v1";
-const urlsToCache = [
-  "/",
-  "/index.html",
-  "/static/css/main.css",
-  "/static/js/main.js",
-];
+const CACHE_NAME = "accounting-app-v2";
+const urlsToCache = ["/", "/index.html"];
 
-// Встановлення Service Worker і кешування ресурсів
+// Встановлення Service Worker
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -36,12 +31,38 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// Перехоплення запитів і обслуговування з кешу
+// Перехоплення запитів
 self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Для CSS та JS файлів - спочатку мережа, потім кеш
+  if (
+    url.pathname.includes("/static/css/") ||
+    url.pathname.includes("/static/js/")
+  ) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Клонуємо відповідь для кешування
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseToCache);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Якщо мережа недоступна, повертаємо з кешу
+          return caches.match(request);
+        }),
+    );
+    return;
+  }
+
+  // Для інших ресурсів - спочатку кеш, потім мережа
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Повертаємо з кешу або робимо запит до мережі
-      return response || fetch(event.request);
+    caches.match(request).then((response) => {
+      return response || fetch(request);
     }),
   );
 });
