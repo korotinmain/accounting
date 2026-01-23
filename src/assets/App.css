@@ -565,15 +565,16 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
   body {
-    padding: 12px;
+    padding: 8px;
   }
 
   .app-container {
-    padding: 20px;
+    padding: 16px;
+    border-radius: 16px;
   }
 
   .app-header {
-    padding: 24px;
+    padding: 20px;
   }
 
   .days-grid {
@@ -582,12 +583,18 @@ body {
 }
 
 @media (max-width: 480px) {
+  body {
+    padding: 4px;
+  }
+
   .app-container {
-    padding: 16px;
+    padding: 12px;
+    border-radius: 12px;
   }
 
   .app-header {
-    padding: 20px;
+    padding: 16px;
+    border-radius: 16px;
   }
 
   .btn-add-day {

@@ -19,7 +19,8 @@
 
 .action-buttons-container button {
   flex: 1;
-  min-height: 48px;
+  min-height: 52px;
+  font-size: 15px;
 }
 
 /* Tablet and up */
