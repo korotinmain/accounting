@@ -62,7 +62,7 @@ const EntryModal = ({
 
   const handleSave = useCallback(() => {
     // Валідація
-    if (!editingEntry && !validateRequired(personName)) {
+    if (!editingEntry && !validateRequired(personName) && !doctorName) {
       Swal.fire({
         icon: "warning",
         title: "Заповніть ПІБ",
