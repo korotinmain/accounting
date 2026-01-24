@@ -1,15 +1,11 @@
 import React, { useState, useCallback, useEffect } from "react";
 import Modal from "react-modal";
-import DatePicker, { registerLocale } from "react-datepicker";
-import { uk } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import Swal from "sweetalert2";
 import StyledButton from "./StyledButton";
-import { FormInput } from "./common";
+import { FormInput, DatePickerField } from "./common";
 import { SWAL_CONFIG, MESSAGES } from "../utils/constants";
 import {
   validateRequired,
@@ -17,10 +13,6 @@ import {
   sanitizeNumber,
 } from "../utils/validation";
 import "../assets/components/AddDayModal.css";
-import "../assets/components/DatePicker.css";
-
-// Реєструємо українську локаль
-registerLocale("uk", uk);
 
 /**
  * Модальне вікно для додавання/редагування запису
@@ -167,45 +159,17 @@ const EntryModal = ({
             onChange={(e) => setPersonName(e.target.value)}
             placeholder="Введіть ПІБ"
             className="mb-lg"
+            disabled
           />
         )}
 
-        <div className="form-group" style={{ marginBottom: "20px" }}>
-          <label
-            style={{
-              color: "#475569",
-              fontWeight: "600",
-              fontSize: "0.9em",
-              marginBottom: "8px",
-              display: "block",
-            }}
-          >
-            Дата
-          </label>
-          <div style={{ position: "relative" }}>
-            <DatePicker
-              selected={date}
-              onChange={(selectedDate) => setDate(selectedDate || new Date())}
-              dateFormat="dd.MM.yyyy"
-              locale="uk"
-              wrapperClassName="datepicker-wrapper"
-              calendarClassName="custom-calendar"
-              showPopperArrow={false}
-              portalId="root-portal"
-            />
-            <CalendarTodayIcon
-              style={{
-                position: "absolute",
-                right: "12px",
-                top: "50%",
-                transform: "translateY(-50%)",
-                color: "#6366f1",
-                fontSize: "1.2em",
-                pointerEvents: "none",
-              }}
-            />
-          </div>
-        </div>
+        <DatePickerField
+          label="Дата"
+          id="entry-date-input"
+          selected={date}
+          onChange={setDate}
+          required
+        />
 
         <FormInput
           label="Сума"

@@ -1,15 +1,11 @@
 import React, { useState, useCallback, useEffect } from "react";
 import Modal from "react-modal";
-import DatePicker, { registerLocale } from "react-datepicker";
-import { uk } from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import Swal from "sweetalert2";
 import StyledButton from "./StyledButton";
-import { FormInput } from "./common";
+import { FormInput, DatePickerField } from "./common";
 import { SWAL_CONFIG } from "../utils/constants";
 import {
   validateRequired,
@@ -17,10 +13,6 @@ import {
   sanitizeNumber,
 } from "../utils/validation";
 import "../assets/components/PersonnelModal.css";
-import "../assets/components/DatePicker.css";
-
-// Реєструємо українську локаль
-registerLocale("uk", uk);
 
 /**
  * Модальне вікно для додавання/редагування витрат на персонал
@@ -28,10 +20,19 @@ registerLocale("uk", uk);
  * @param {function} onClose - Callback для закриття
  * @param {function} onSave - Callback для збереження
  * @param {Object} editingPersonnel - Запис персоналу для редагування (якщо є)
+ * @param {string} doctorName - Ім'я лікаря для автозаповнення
+ * @param {Date} selectedMonth - Вибраний місяць для defaultDate
  */
-const PersonnelModal = ({ isOpen, onClose, onSave, editingPersonnel }) => {
-  const [date, setDate] = useState(new Date());
-  const [personName, setPersonName] = useState("");
+const PersonnelModal = ({
+  isOpen,
+  onClose,
+  onSave,
+  editingPersonnel,
+  doctorName = "",
+  selectedMonth = new Date(),
+}) => {
+  const [date, setDate] = useState(selectedMonth);
+  const [personName, setPersonName] = useState(doctorName);
   const [personnelAmount, setPersonnelAmount] = useState("");
 
   // Заповнюємо форму при редагуванні
@@ -49,11 +50,12 @@ const PersonnelModal = ({ isOpen, onClose, onSave, editingPersonnel }) => {
         setDate(dateObj);
       }
     } else {
-      setDate(new Date());
-      setPersonName("");
+      // При створенні нового запису використовуємо вибраний місяць і ім'я лікаря
+      setDate(selectedMonth);
+      setPersonName(doctorName);
       setPersonnelAmount("");
     }
-  }, [editingPersonnel, isOpen]);
+  }, [editingPersonnel, isOpen, doctorName, selectedMonth]);
 
   const handleSave = useCallback(() => {
     // Валідація ПІБ
@@ -115,17 +117,25 @@ const PersonnelModal = ({ isOpen, onClose, onSave, editingPersonnel }) => {
 
     onSave(personnelData);
 
-    setPersonName("");
+    setPersonName(doctorName);
     setPersonnelAmount("");
-    setDate(new Date());
-  }, [personName, personnelAmount, date, editingPersonnel, onSave]);
+    setDate(selectedMonth);
+  }, [
+    personName,
+    personnelAmount,
+    date,
+    editingPersonnel,
+    onSave,
+    doctorName,
+    selectedMonth,
+  ]);
 
   const handleClose = useCallback(() => {
-    setDate(new Date());
-    setPersonName("");
+    setDate(selectedMonth);
+    setPersonName(doctorName);
     setPersonnelAmount("");
     onClose();
-  }, [onClose]);
+  }, [onClose, selectedMonth, doctorName]);
 
   return (
     <Modal
@@ -163,28 +173,18 @@ const PersonnelModal = ({ isOpen, onClose, onSave, editingPersonnel }) => {
           onChange={(e) => setPersonName(e.target.value)}
           placeholder="Введіть ПІБ"
           icon={<PersonIcon />}
+          disabled
           required
         />
 
         {/* Поле для дати */}
-        <div className="form-group">
-          <label htmlFor="personnel-date-input">
-            <CalendarTodayIcon className="label-icon" />
-            Дата
-          </label>
-          <div className="datepicker-wrapper">
-            <DatePicker
-              id="personnel-date-input"
-              selected={date}
-              onChange={(selectedDate) => setDate(selectedDate)}
-              dateFormat="dd.MM.yyyy"
-              locale="uk"
-              className="form-input"
-              readOnly
-              calendarClassName="custom-calendar"
-            />
-          </div>
-        </div>
+        <DatePickerField
+          label="Дата"
+          id="personnel-date-input"
+          selected={date}
+          onChange={setDate}
+          required
+        />
 
         {/* Поле для суми */}
         <FormInput

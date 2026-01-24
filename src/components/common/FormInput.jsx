@@ -13,6 +13,7 @@ import "../../assets/components/FormInput.css";
  * @param {string} error - Текст помилки
  * @param {string} hint - Підказка
  * @param {ReactNode} icon - Іконка
+ * @param {string} suffix - Текст після інпуту (наприклад "грн")
  * @param {string} className - Додаткові класи
  */
 const FormInput = ({
@@ -26,6 +27,7 @@ const FormInput = ({
   error,
   hint,
   icon,
+  suffix,
   className = "",
   ...props
 }) => {
@@ -47,9 +49,11 @@ const FormInput = ({
           onChange={onChange}
           placeholder={placeholder}
           disabled={disabled}
-          className={`form-input ${icon ? "has-icon" : ""} ${error ? "has-error" : ""}`}
+          className={`form-input ${icon ? "has-icon" : ""} ${suffix ? "has-suffix" : ""} ${error ? "has-error" : ""}`}
           {...props}
         />
+
+        {suffix && <div className="form-input-suffix">{suffix}</div>}
       </div>
 
       {error && <div className="form-input-error">{error}</div>}

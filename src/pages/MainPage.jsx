@@ -676,6 +676,8 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         onClose={handleClosePersonnelModal}
         onSave={handleSavePersonnel}
         editingPersonnel={editingPersonnel}
+        doctorName={selectedDoctor}
+        selectedMonth={selectedMonth}
       />
     </div>
   );

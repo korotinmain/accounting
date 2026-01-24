@@ -1,5 +1,21 @@
 /* Custom DatePicker Styles */
 
+/* DatePicker container wrapper */
+.datepicker-container {
+  position: relative;
+  width: 100%;
+}
+
+.datepicker-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  pointer-events: none;
+  font-size: 20px;
+}
+
 .datepicker-wrapper {
   width: 100%;
 }

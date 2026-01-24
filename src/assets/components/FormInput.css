@@ -34,6 +34,10 @@
   padding-left: var(--spacing-5xl);
 }
 
+.form-input.has-suffix {
+  padding-right: 60px;
+}
+
 .form-input:focus {
   outline: none;
   border-color: var(--color-primary);
@@ -68,6 +72,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.form-input-suffix {
+  position: absolute;
+  right: var(--spacing-lg);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-gray-500);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
+  pointer-events: none;
+  user-select: none;
 }
 
 .form-input-error {

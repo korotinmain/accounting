@@ -35,10 +35,23 @@ const Settings = ({ onBack }) => {
     }
   }, [loading, personnelInitialBalance, operationalInitialBalance]);
 
-  const handleSave = async () => {
-    const success = await saveSettings(personnelInput, operationalInput);
+  const handleSavePersonnel = async () => {
+    const success = await saveSettings(
+      personnelInput,
+      operationalInitialBalance.toString(),
+    );
     if (success) {
-      // Можна додати додаткову логіку після успішного збереження
+      // Оновлення успішне
+    }
+  };
+
+  const handleSaveOperational = async () => {
+    const success = await saveSettings(
+      personnelInitialBalance.toString(),
+      operationalInput,
+    );
+    if (success) {
+      // Оновлення успішне
     }
   };
 
@@ -97,15 +110,26 @@ const Settings = ({ onBack }) => {
                   description="Початковий баланс для розрахунків персоналу"
                   variant="primary"
                 />
-                <FormInput
-                  id="personnel-balance"
-                  type="number"
-                  value={personnelInput}
-                  onChange={handlePersonnelChange}
-                  placeholder="0"
-                  disabled={saving}
-                  hint="грн"
-                />
+                <div className="setting-input-group">
+                  <FormInput
+                    id="personnel-balance"
+                    type="number"
+                    value={personnelInput}
+                    onChange={handlePersonnelChange}
+                    placeholder="0"
+                    disabled={saving}
+                    suffix="грн"
+                  />
+                  <StyledButton
+                    variant="success"
+                    size="medium"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSavePersonnel}
+                    disabled={saving}
+                  >
+                    Зберегти
+                  </StyledButton>
+                </div>
               </div>
 
               {/* Баланс Операційна */}
@@ -116,51 +140,27 @@ const Settings = ({ onBack }) => {
                   description="Початковий баланс для операційних витрат"
                   variant="secondary"
                 />
-                <FormInput
-                  id="operational-balance"
-                  type="number"
-                  value={operationalInput}
-                  onChange={handleOperationalChange}
-                  placeholder="0"
-                  disabled={saving}
-                  hint="грн"
-                />
-              </div>
-            </div>
-
-            {/* Попередній перегляд */}
-            <div className="settings-preview">
-              <h3>Поточні значення:</h3>
-              <div className="preview-values">
-                <div className="preview-item personnel-preview">
-                  <div className="preview-label">
-                    <PeopleIcon className="preview-icon" />
-                    <span>Персонал:</span>
-                  </div>
-                  <strong>{formatCurrency(personnelInitialBalance)}</strong>
-                </div>
-                <div className="preview-item operational-preview">
-                  <div className="preview-label">
-                    <BusinessCenterIcon className="preview-icon" />
-                    <span>Операційна:</span>
-                  </div>
-                  <strong>{formatCurrency(operationalInitialBalance)}</strong>
+                <div className="setting-input-group">
+                  <FormInput
+                    id="operational-balance"
+                    type="number"
+                    value={operationalInput}
+                    onChange={handleOperationalChange}
+                    placeholder="0"
+                    disabled={saving}
+                    suffix="грн"
+                  />
+                  <StyledButton
+                    variant="success"
+                    size="medium"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSaveOperational}
+                    disabled={saving}
+                  >
+                    Зберегти
+                  </StyledButton>
                 </div>
               </div>
-            </div>
-
-            {/* Кнопка збереження */}
-            <div className="settings-actions">
-              <StyledButton
-                variant="success"
-                size="large"
-                fullWidth
-                startIcon={<SaveIcon />}
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? "Збереження..." : "Зберегти налаштування"}
-              </StyledButton>
             </div>
           </div>
         </div>
