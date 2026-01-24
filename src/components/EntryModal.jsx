@@ -1,8 +1,12 @@
 import React, { useState, useCallback, useEffect } from "react";
 import Modal from "react-modal";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { uk } from "date-fns/locale";
+import "react-datepicker/dist/react-datepicker.css";
 import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import PersonIcon from "@mui/icons-material/Person";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import Swal from "sweetalert2";
 import StyledButton from "./StyledButton";
 import { FormInput } from "./common";
@@ -12,8 +16,11 @@ import {
   validateNumber,
   sanitizeNumber,
 } from "../utils/validation";
-import { getTodayString } from "../utils/dateUtils";
 import "../assets/components/AddDayModal.css";
+import "../assets/components/DatePicker.css";
+
+// Реєструємо українську локаль
+registerLocale("uk", uk);
 
 /**
  * Модальне вікно для додавання/редагування запису
@@ -30,7 +37,7 @@ const EntryModal = ({
   editingEntry,
   doctorName = "",
 }) => {
-  const [date, setDate] = useState(getTodayString());
+  const [date, setDate] = useState(new Date());
   const [personName, setPersonName] = useState("");
   const [amount, setAmount] = useState("");
 
@@ -44,17 +51,17 @@ const EntryModal = ({
           editingEntry.date instanceof Date
             ? editingEntry.date
             : new Date(editingEntry.date);
-        setDate(dateObj.toISOString().split("T")[0]);
+        setDate(dateObj);
       }
     } else {
-      setDate(getTodayString());
+      setDate(new Date());
       setPersonName("");
       setAmount("");
     }
   }, [editingEntry, isOpen]);
 
   const handleClose = useCallback(() => {
-    setDate(getTodayString());
+    setDate(new Date());
     setPersonName("");
     setAmount("");
     onClose();
@@ -93,10 +100,11 @@ const EntryModal = ({
     }
 
     const sanitizedAmount = sanitizeNumber(amount);
+    const dateString = date.toISOString().split("T")[0];
     const entryData = {
       name: editingEntry ? personName.trim() : personName.trim() || doctorName,
       amount: sanitizedAmount,
-      date: date,
+      date: dateString,
       ...(editingEntry && { id: editingEntry.id, dayId: editingEntry.dayId }),
     };
 
@@ -162,14 +170,42 @@ const EntryModal = ({
           />
         )}
 
-        <FormInput
-          label="Дата"
-          id="date-input"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="mb-lg"
-        />
+        <div className="form-group" style={{ marginBottom: "20px" }}>
+          <label
+            style={{
+              color: "#475569",
+              fontWeight: "600",
+              fontSize: "0.9em",
+              marginBottom: "8px",
+              display: "block",
+            }}
+          >
+            Дата
+          </label>
+          <div style={{ position: "relative" }}>
+            <DatePicker
+              selected={date}
+              onChange={(selectedDate) => setDate(selectedDate || new Date())}
+              dateFormat="dd.MM.yyyy"
+              locale="uk"
+              wrapperClassName="datepicker-wrapper"
+              calendarClassName="custom-calendar"
+              showPopperArrow={false}
+              portalId="root-portal"
+            />
+            <CalendarTodayIcon
+              style={{
+                position: "absolute",
+                right: "12px",
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "#6366f1",
+                fontSize: "1.2em",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+        </div>
 
         <FormInput
           label="Сума"
