@@ -13,20 +13,18 @@ import "../assets/components/MonthlyStats.css";
  * Компонент місячної статистики - показує дані за вибраний місяць
  * @param {Array} days - Масив днів
  * @param {number} currentBalance - Поточний баланс
+ * @param {number} initialBalance - Початковий баланс
  * @param {string} type - Тип (personnel/operational)
  * @param {Date} selectedMonth - Вибраний місяць
  * @param {function} onMonthChange - Callback для зміни місяця
- * @param {number} totalPersonnelExpenses - Загальні витрати на персонал
- * @param {number} totalGeneralExpenses - Загальні витрати до загального
  */
 const MonthlyStats = ({
   days,
   currentBalance,
+  initialBalance = 0,
   type,
   selectedMonth,
   onMonthChange,
-  totalPersonnelExpenses = 0,
-  totalGeneralExpenses = 0,
 }) => {
   // Отримуємо статистику за вибраний місяць
   const monthStats = useMemo(() => {
@@ -137,23 +135,14 @@ const MonthlyStats = ({
             >
               {currentBalance >= 0 ? "▲ Позитивний" : "▼ Негативний"}
             </div>
-            {type === "personnel" &&
-              (totalPersonnelExpenses > 0 || totalGeneralExpenses > 0) && (
-                <div className="balance-breakdown">
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">На персонал:</span>
-                    <span className="breakdown-value personnel">
-                      -{formatCurrency(totalPersonnelExpenses)} грн
-                    </span>
-                  </div>
-                  <div className="breakdown-item">
-                    <span className="breakdown-label">До загального:</span>
-                    <span className="breakdown-value general">
-                      +{formatCurrency(totalGeneralExpenses)} грн
-                    </span>
-                  </div>
-                </div>
-              )}
+            <div className="balance-breakdown">
+              <div className="breakdown-item">
+                <span className="breakdown-label">Початковий баланс:</span>
+                <span className="breakdown-value" style={{ color: "#6366f1" }}>
+                  {formatCurrency(initialBalance)} грн
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </Card>

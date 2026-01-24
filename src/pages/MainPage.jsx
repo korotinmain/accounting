@@ -582,11 +582,10 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         <MonthlyStats
           days={activeDays.days}
           currentBalance={currentBalance}
+          initialBalance={activeBalance.initialBalance}
           type={activeTab}
           selectedMonth={selectedMonth}
           onMonthChange={handleMonthChange}
-          totalPersonnelExpenses={totalPersonnelExpenses}
-          totalGeneralExpenses={totalGeneralExpenses}
         />
       </div>
 
