@@ -490,8 +490,14 @@
     justify-content: center;
   }
 
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
   .stat-item {
     padding: 14px;
+    width: 100%;
   }
 
   .stat-value {
