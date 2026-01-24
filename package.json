@@ -17,11 +17,11 @@
     "sweetalert2": "^11.26.17"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "start:staging": "env-cmd -f .env.staging react-scripts start",
-    "build": "react-scripts build",
-    "build:staging": "env-cmd -f .env.staging react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "start:staging": "env-cmd -f .env.staging craco start",
+    "build": "GENERATE_SOURCEMAP=false craco build",
+    "build:staging": "GENERATE_SOURCEMAP=false env-cmd -f .env.staging craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && firebase deploy",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",
@@ -30,6 +30,7 @@
     "firebase:use": "firebase use accounting-a2ac6"
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "env-cmd": "^11.0.0",
     "react-scripts": "5.0.1"
   },

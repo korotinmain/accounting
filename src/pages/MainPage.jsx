@@ -34,6 +34,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   const [showModal, setShowModal] = useState(false);
   const [showPersonnelModal, setShowPersonnelModal] = useState(false);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [editingPersonnel, setEditingPersonnel] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   // Hooks для personnel
@@ -53,7 +54,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   // Фільтруємо записи по вибраному місяцю для Personnel
   const filteredData = useMemo(() => {
     if (activeTab !== "personnel")
-      return { entries: [], personnelAmount: 0, days: [] };
+      return { entries: [], personnelEntries: [], days: [] };
 
     const selectedMonthValue = selectedMonth.getMonth();
     const selectedYear = selectedMonth.getFullYear();
@@ -70,7 +71,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
       );
     });
 
-    // Збираємо всі записи з інформацією про дату
+    // Збираємо всі записи загальні з інформацією про дату
     const allEntries = daysForMonth.reduce((acc, day) => {
       const dayDate = day.dateString
         ? new Date(day.dateString)
@@ -86,13 +87,27 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
       return [...acc, ...entriesWithDate];
     }, []);
 
-    const totalPersonnel = daysForMonth.reduce((sum, day) => {
-      return sum + (day.personnel || 0);
-    }, 0);
+    // Збираємо всі записи персоналу з інформацією про дату
+    const allPersonnelEntries = daysForMonth.reduce((acc, day) => {
+      const dayDate = day.dateString
+        ? new Date(day.dateString)
+        : day.date?.toDate
+          ? day.date.toDate()
+          : new Date(day.date);
+
+      const personnelEntriesWithDate = (day.personnelEntries || []).map(
+        (entry) => ({
+          ...entry,
+          date: dayDate,
+          dayId: day.id,
+        }),
+      );
+      return [...acc, ...personnelEntriesWithDate];
+    }, []);
 
     return {
       entries: allEntries,
-      personnelAmount: totalPersonnel,
+      personnelEntries: allPersonnelEntries,
       days: daysForMonth,
     };
   }, [activeTab, personnelDays.days, selectedMonth]);
@@ -109,8 +124,11 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           day.withdrawals?.reduce((sum, w) => sum + w.amount, 0) || 0;
         balance += dayTotal - withdrawalTotal;
       } else {
-        balance -= day.personnel || 0;
-        balance += dayTotal;
+        // Витрати на персонал (віднімаємо)
+        const personnelTotal =
+          day.personnelEntries?.reduce((sum, e) => sum + e.amount, 0) || 0;
+        // Загальні надходження (додаємо)
+        balance += dayTotal - personnelTotal;
       }
     });
 
@@ -142,8 +160,14 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     setEditingEntry(null);
   }, []);
 
+  const handleOpenPersonnelModal = useCallback((personnel = null) => {
+    setEditingPersonnel(personnel);
+    setShowPersonnelModal(true);
+  }, []);
+
   const handleClosePersonnelModal = useCallback(() => {
     setShowPersonnelModal(false);
+    setEditingPersonnel(null);
   }, []);
 
   const handleDeleteEntry = useCallback(
@@ -181,7 +205,8 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           const entryToDelete = day.entries.find((e) => e.id === entryId);
           if (entryToDelete) {
             const updatedEntries = day.entries.filter((e) => e.id !== entryId);
-            if (updatedEntries.length === 0 && !day.personnel) {
+            // Перевіряємо, чи є ще записи персоналу
+            if (updatedEntries.length === 0 && !day.personnelEntries?.length) {
               await personnelDays.deleteDay(day.id);
             } else {
               await personnelDays.updateDay(day.id, {
@@ -217,6 +242,82 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     [personnelDays, personnelBalance, selectedMonth],
   );
 
+  const handleDeletePersonnelEntry = useCallback(
+    async (personnelId) => {
+      const result = await Swal.fire({
+        title: "Видалити запис персоналу?",
+        text: "Цю дію неможливо скасувати",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
+        cancelButtonColor: SWAL_CONFIG.cancelButtonColor,
+        confirmButtonText: "Так, видалити",
+        cancelButtonText: "Скасувати",
+      });
+
+      if (!result.isConfirmed) return;
+
+      try {
+        const selectedMonthValue = selectedMonth.getMonth();
+        const selectedYear = selectedMonth.getFullYear();
+
+        const daysForMonth = personnelDays.days.filter((day) => {
+          const dayDate = day.dateString
+            ? new Date(day.dateString)
+            : day.date?.toDate
+              ? day.date.toDate()
+              : new Date(day.date);
+          return (
+            dayDate.getMonth() === selectedMonthValue &&
+            dayDate.getFullYear() === selectedYear
+          );
+        });
+
+        for (const day of daysForMonth) {
+          const personnelToDelete = day.personnelEntries?.find(
+            (e) => e.id === personnelId,
+          );
+          if (personnelToDelete) {
+            const updatedPersonnelEntries = day.personnelEntries.filter(
+              (e) => e.id !== personnelId,
+            );
+            // Перевіряємо, чи є ще записи чи загальні entries
+            if (updatedPersonnelEntries.length === 0 && !day.entries?.length) {
+              await personnelDays.deleteDay(day.id);
+            } else {
+              await personnelDays.updateDay(day.id, {
+                ...day,
+                personnelEntries: updatedPersonnelEntries,
+              });
+            }
+            break;
+          }
+        }
+
+        Swal.fire({
+          icon: "success",
+          title: "Запис видалено",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+
+        await Promise.all([
+          personnelBalance.loadBalance(),
+          personnelDays.loadDays(true),
+        ]);
+      } catch (error) {
+        console.error("Помилка видалення запису персоналу:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Помилка",
+          text: "Не вдалося видалити запис",
+          confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
+        });
+      }
+    },
+    [personnelDays, personnelBalance, selectedMonth],
+  );
+
   const handleEditEntry = useCallback(
     async (entryId) => {
       // Знаходимо запис в filteredData
@@ -233,25 +334,106 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     [filteredData.entries, handleOpenModal],
   );
 
+  const handleEditPersonnelEntry = useCallback(
+    async (personnelId) => {
+      // Знаходимо запис персоналу в filteredData
+      const personnelToEdit = filteredData.personnelEntries.find(
+        (e) => e.id === personnelId,
+      );
+
+      if (!personnelToEdit) {
+        console.log("Personnel entry not found in filteredData");
+        return;
+      }
+
+      // Відкриваємо модалку з даними для редагування
+      handleOpenPersonnelModal(personnelToEdit);
+    },
+    [filteredData.personnelEntries, handleOpenPersonnelModal],
+  );
+
   const handleSavePersonnel = useCallback(
-    async (dayData) => {
+    async (personnelData) => {
       try {
-        await personnelDays.createDay(dayData);
+        // Якщо редагуємо існуючий запис
+        if (personnelData.id && personnelData.dayId) {
+          const day = personnelDays.days.find(
+            (d) => d.id === personnelData.dayId,
+          );
+          if (day) {
+            const updatedPersonnelEntries = (day.personnelEntries || []).map(
+              (e) =>
+                e.id === personnelData.id
+                  ? {
+                      ...e,
+                      name: personnelData.name,
+                      amount: personnelData.amount,
+                    }
+                  : e,
+            );
+            await personnelDays.updateDay(day.id, {
+              ...day,
+              personnelEntries: updatedPersonnelEntries,
+            });
+          }
+        } else {
+          // Створюємо новий запис
+          const existingDay = personnelDays.days.find((day) => {
+            const dayDate =
+              day.dateString ||
+              (day.date?.toDate
+                ? day.date.toDate().toISOString().split("T")[0]
+                : new Date(day.date).toISOString().split("T")[0]);
+            return dayDate === personnelData.date;
+          });
+
+          if (existingDay) {
+            // Додаємо запис персоналу до існуючого дня з унікальним ID
+            const newPersonnelId = `${existingDay.id}-personnel-${(existingDay.personnelEntries || []).length}`;
+            const updatedPersonnelEntries = [
+              ...(existingDay.personnelEntries || []),
+              {
+                id: newPersonnelId,
+                name: personnelData.name,
+                amount: personnelData.amount,
+              },
+            ];
+            await personnelDays.updateDay(existingDay.id, {
+              ...existingDay,
+              personnelEntries: updatedPersonnelEntries,
+            });
+          } else {
+            // Створюємо новий день з записом персоналу
+            await personnelDays.createDay({
+              dateString: personnelData.date,
+              entries: [],
+              personnelEntries: [
+                { name: personnelData.name, amount: personnelData.amount },
+              ],
+            });
+          }
+        }
+
         Swal.fire({
           icon: "success",
-          title: "Суму персоналу додано",
+          title: personnelData.id
+            ? "Запис оновлено"
+            : "Витрати на персонал додано",
           showConfirmButton: false,
           timer: 1500,
         });
 
-        await personnelBalance.loadBalance();
+        await Promise.all([
+          personnelBalance.loadBalance(),
+          personnelDays.loadDays(true),
+        ]);
         handleClosePersonnelModal();
       } catch (error) {
         console.error("Помилка збереження:", error);
         Swal.fire({
           icon: "error",
           title: "Помилка",
-          text: "Не вдалося зберегти суму персоналу",
+          text: "Не вдалося зберегти витрати на персонал",
           confirmButtonColor: SWAL_CONFIG.confirmButtonColor,
         });
       }
@@ -311,7 +493,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
             await personnelDays.createDay({
               dateString: entryData.date,
               entries: [{ name: entryData.name, amount: entryData.amount }],
-              personnel: 0,
+              personnelEntries: [],
             });
           }
         }
@@ -327,6 +509,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           personnelBalance.loadBalance(),
           personnelDays.loadDays(true),
         ]);
+        handleCloseModal();
       } catch (error) {
         console.error("Помилка збереження:", error);
         Swal.fire({
@@ -337,7 +520,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         });
       }
     },
-    [personnelDays, personnelBalance],
+    [personnelDays, personnelBalance, handleCloseModal],
   );
 
   // Loading state
@@ -388,7 +571,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
               variant="secondary"
               size="medium"
               startIcon={<AddIcon />}
-              onClick={() => setShowPersonnelModal(true)}
+              onClick={() => handleOpenPersonnelModal(null)}
             >
               Персоналу
             </StyledButton>
@@ -408,9 +591,11 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         <div className="personnel-section">
           <EntriesTable
             entries={filteredData.entries}
-            personnelAmount={filteredData.personnelAmount}
+            personnelEntries={filteredData.personnelEntries}
             onEdit={handleEditEntry}
             onDelete={handleDeleteEntry}
+            onEditPersonnel={handleEditPersonnelEntry}
+            onDeletePersonnel={handleDeletePersonnelEntry}
           />
         </div>
       ) : (
@@ -466,7 +651,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         isOpen={showPersonnelModal}
         onClose={handleClosePersonnelModal}
         onSave={handleSavePersonnel}
-        selectedDate={new Date().toISOString().split("T")[0]}
+        editingPersonnel={editingPersonnel}
       />
     </div>
   );

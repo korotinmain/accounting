@@ -68,11 +68,18 @@ export const useDays = (type) => {
               id: withdrawal.id || `${doc.id}-withdrawal-${index}`,
             }),
           );
+          const personnelEntriesWithIds = (data.personnelEntries || []).map(
+            (entry, index) => ({
+              ...entry,
+              id: entry.id || `${doc.id}-personnel-${index}`,
+            }),
+          );
           return {
             id: doc.id,
             ...data,
             entries: entriesWithIds,
             withdrawals: withdrawalsWithIds,
+            personnelEntries: personnelEntriesWithIds,
           };
         });
 

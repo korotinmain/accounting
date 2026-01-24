@@ -53,7 +53,9 @@ const MonthlyStats = ({
     let totalExpenses = 0;
     if (type === "personnel") {
       totalExpenses = monthDays.reduce((sum, day) => {
-        return sum + (day.personnel || 0);
+        const personnelTotal =
+          day.personnelEntries?.reduce((acc, e) => acc + e.amount, 0) || 0;
+        return sum + personnelTotal;
       }, 0);
     } else {
       totalExpenses = monthDays.reduce((sum, day) => {

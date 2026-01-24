@@ -1,10 +1,24 @@
 /* Контейнер таблиці - Mobile First */
 .entries-table-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  background: transparent;
   animation: fadeIn 0.4s ease;
+}
+
+/* Заголовок секції */
+.table-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 20px 0 12px 0;
+  padding-left: 4px;
+}
+
+.table-section-title:first-child {
+  margin-top: 0;
+}
+
+.personnel-section-title {
+  margin-top: 32px;
 }
 
 @keyframes fadeIn {
@@ -22,11 +36,39 @@
 .entries-table {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-bottom: 16px;
 }
 
 .entries-table thead {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+}
+
+/* Стилі для таблиці персоналу */
+.personnel-table thead {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+}
+
+.personnel-table .entry-date,
+.personnel-table .entry-icon {
+  color: #f59e0b;
+}
+
+.personnel-table .entry-amount {
+  color: #ef4444;
+}
+
+.personnel-total-row {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-top: 2px solid #ef4444;
+}
+
+.personnel-total-row .total-amount {
+  color: #ef4444;
 }
 
 .entries-table th {
@@ -119,6 +161,34 @@
   height: 100%;
   box-sizing: border-box;
   min-height: 44px;
+}
+
+.legacy-badge {
+  display: inline-block;
+  font-size: 10px;
+  padding: 2px 6px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  color: #6b7280;
+  font-weight: 600;
+  margin-left: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.legacy-row {
+  background: #f9fafb !important;
+  opacity: 0.9;
+}
+
+.legacy-row:hover {
+  background: #f3f4f6 !important;
+}
+
+.legacy-row .entry-name {
+  font-style: italic;
+  color: #6b7280;
 }
 
 .entry-icon {

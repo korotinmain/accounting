@@ -34,6 +34,9 @@ jobs:
           echo "REACT_APP_FIREBASE_APP_ID=${{ secrets.REACT_APP_FIREBASE_APP_ID }}" >> .env
 
       - name: Build React app
+        env:
+          CI: false
+          GENERATE_SOURCEMAP: false
         run: npm run build
 
       - name: Deploy to Firebase Hosting
