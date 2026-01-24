@@ -16,6 +16,8 @@ import "../assets/components/MonthlyStats.css";
  * @param {string} type - Тип (personnel/operational)
  * @param {Date} selectedMonth - Вибраний місяць
  * @param {function} onMonthChange - Callback для зміни місяця
+ * @param {number} totalPersonnelExpenses - Загальні витрати на персонал
+ * @param {number} totalGeneralExpenses - Загальні витрати до загального
  */
 const MonthlyStats = ({
   days,
@@ -23,6 +25,8 @@ const MonthlyStats = ({
   type,
   selectedMonth,
   onMonthChange,
+  totalPersonnelExpenses = 0,
+  totalGeneralExpenses = 0,
 }) => {
   // Отримуємо статистику за вибраний місяць
   const monthStats = useMemo(() => {
@@ -133,6 +137,23 @@ const MonthlyStats = ({
             >
               {currentBalance >= 0 ? "▲ Позитивний" : "▼ Негативний"}
             </div>
+            {type === "personnel" &&
+              (totalPersonnelExpenses > 0 || totalGeneralExpenses > 0) && (
+                <div className="balance-breakdown">
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">На персонал:</span>
+                    <span className="breakdown-value personnel">
+                      -{formatCurrency(totalPersonnelExpenses)} грн
+                    </span>
+                  </div>
+                  <div className="breakdown-item">
+                    <span className="breakdown-label">До загального:</span>
+                    <span className="breakdown-value general">
+                      +{formatCurrency(totalGeneralExpenses)} грн
+                    </span>
+                  </div>
+                </div>
+              )}
           </div>
         </div>
       </Card>

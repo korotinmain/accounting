@@ -135,6 +135,28 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     return balance;
   }, [activeBalance.initialBalance, activeDays.days, activeTab]);
 
+  // Обчислення загальних витрат на персонал та загальне
+  const { totalPersonnelExpenses, totalGeneralExpenses } = useMemo(() => {
+    if (activeTab !== "personnel") {
+      return { totalPersonnelExpenses: 0, totalGeneralExpenses: 0 };
+    }
+
+    let personnel = 0;
+    let general = 0;
+
+    personnelDays.days.forEach((day) => {
+      const personnelTotal =
+        day.personnelEntries?.reduce((sum, e) => sum + e.amount, 0) || 0;
+      const generalTotal =
+        day.entries?.reduce((sum, e) => sum + e.amount, 0) || 0;
+
+      personnel += personnelTotal;
+      general += generalTotal;
+    });
+
+    return { totalPersonnelExpenses: personnel, totalGeneralExpenses: general };
+  }, [activeTab, personnelDays.days]);
+
   // Обробник виходу
   const handleLogout = useCallback(() => {
     onLogout();
@@ -563,29 +585,31 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           type={activeTab}
           selectedMonth={selectedMonth}
           onMonthChange={handleMonthChange}
+          totalPersonnelExpenses={totalPersonnelExpenses}
+          totalGeneralExpenses={totalGeneralExpenses}
         />
-
-        {activeTab === "personnel" && (
-          <div className="action-buttons-container">
-            <StyledButton
-              variant="secondary"
-              size="medium"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenPersonnelModal(null)}
-            >
-              Персоналу
-            </StyledButton>
-            <StyledButton
-              variant="primary"
-              size="medium"
-              startIcon={<AddIcon />}
-              onClick={() => handleOpenModal(null)}
-            >
-              Загальне
-            </StyledButton>
-          </div>
-        )}
       </div>
+
+      {activeTab === "personnel" && (
+        <div className="action-buttons-container">
+          <StyledButton
+            variant="secondary"
+            size="medium"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenPersonnelModal(null)}
+          >
+            Персоналу
+          </StyledButton>
+          <StyledButton
+            variant="primary"
+            size="medium"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenModal(null)}
+          >
+            Загальне
+          </StyledButton>
+        </div>
+      )}
 
       {activeTab === "personnel" ? (
         <div className="personnel-section">

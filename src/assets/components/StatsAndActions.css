@@ -49,7 +49,7 @@
   }
 
   .action-buttons-container {
-    flex-direction: column;
+    flex-direction: row;
     min-width: 220px;
   }
 

@@ -107,6 +107,61 @@
   color: #dc2626;
 }
 
+/* Balance Breakdown */
+.balance-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid rgba(16, 185, 129, 0.2);
+}
+
+.breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.breakdown-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #059669;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.breakdown-value {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.breakdown-value.personnel {
+  color: #ef4444;
+}
+
+.breakdown-value.general {
+  color: #10b981;
+}
+
+@media (min-width: 768px) {
+  .balance-breakdown {
+    flex-direction: row;
+    justify-content: space-around;
+    border-top: none;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  .breakdown-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
 /* Main Stats Card */
 .monthly-stats-card {
   background: white;
