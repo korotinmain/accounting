@@ -50,7 +50,7 @@ export const useDays = (type) => {
         if (!silent) setLoading(true);
 
         const daysQuery = query(
-          collection(db, COLLECTIONS.DAYS),
+          collection(db, COLLECTIONS.PERSONNEL),
           where("type", "==", type),
         );
 
@@ -110,7 +110,7 @@ export const useDays = (type) => {
   const createDay = useCallback(
     async (dayData) => {
       try {
-        const docRef = await addDoc(collection(db, COLLECTIONS.DAYS), {
+        const docRef = await addDoc(collection(db, COLLECTIONS.PERSONNEL), {
           ...dayData,
           type: type,
           date: Timestamp.fromDate(parseDate(dayData.dateString)),
@@ -134,7 +134,7 @@ export const useDays = (type) => {
   const updateDay = useCallback(
     async (dayId, dayData) => {
       try {
-        const dayRef = doc(db, COLLECTIONS.DAYS, dayId);
+        const dayRef = doc(db, COLLECTIONS.PERSONNEL, dayId);
         await updateDoc(dayRef, {
           ...dayData,
           date: Timestamp.fromDate(parseDate(dayData.dateString)),
@@ -168,7 +168,7 @@ export const useDays = (type) => {
 
       if (result.isConfirmed) {
         try {
-          await deleteDoc(doc(db, COLLECTIONS.DAYS, dayId));
+          await deleteDoc(doc(db, COLLECTIONS.PERSONNEL, dayId));
           await loadDays(true);
 
           Swal.fire({

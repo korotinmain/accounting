@@ -21,6 +21,8 @@ import "../assets/components/AddDayModal.css";
  * @param {function} onSave - Callback для збереження
  * @param {Object} editingEntry - Запис для редагування (якщо є)
  * @param {string} doctorName - Ім'я лікаря для відображення
+ * @param {boolean} isWithdrawal - Чи це зняття грошей
+ * @param {boolean} isOperational - Чи це operational таб
  */
 const EntryModal = ({
   isOpen,
@@ -28,6 +30,8 @@ const EntryModal = ({
   onSave,
   editingEntry,
   doctorName = "",
+  isWithdrawal = false,
+  isOperational = false,
 }) => {
   const [date, setDate] = useState(new Date());
   const [personName, setPersonName] = useState("");
@@ -97,27 +101,44 @@ const EntryModal = ({
       name: editingEntry ? personName.trim() : personName.trim() || doctorName,
       amount: sanitizedAmount,
       date: dateString,
+      ...(isOperational && { isWithdrawal }),
       ...(editingEntry && { id: editingEntry.id, dayId: editingEntry.dayId }),
     };
 
     onSave(entryData);
     handleClose();
-  }, [date, personName, amount, editingEntry, doctorName, onSave, handleClose]);
+  }, [
+    date,
+    personName,
+    amount,
+    editingEntry,
+    doctorName,
+    onSave,
+    handleClose,
+    isOperational,
+    isWithdrawal,
+  ]);
 
   const handleQuickAmount = useCallback((quickAmount) => {
     setAmount(String(quickAmount));
   }, []);
 
+  const getModalTitle = () => {
+    if (editingEntry) return "Редагувати запис";
+    if (isOperational) return isWithdrawal ? "Зняти гроші" : "Покласти гроші";
+    return "Додати до загального";
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onRequestClose={handleClose}
-      contentLabel={editingEntry ? "Редагувати запис" : "Додати запис"}
+      contentLabel={getModalTitle()}
       className="modal-content"
       overlayClassName="modal-overlay"
     >
       <div className="modal-header">
-        <h3>{editingEntry ? "Редагувати запис" : "Додати до загального"}</h3>
+        <h3>{getModalTitle()}</h3>
         <StyledButton
           iconOnly
           variant="text"

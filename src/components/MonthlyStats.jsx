@@ -11,7 +11,8 @@ import "../assets/components/MonthlyStats.css";
 
 /**
  * Компонент місячної статистики - показує дані за вибраний місяць
- * @param {Array} days - Масив днів
+ * @param {Array} days - Масив днів (для personnel)
+ * @param {Array} entries - Масив записів (для operational)
  * @param {number} currentBalance - Поточний баланс
  * @param {number} initialBalance - Початковий баланс
  * @param {string} type - Тип (personnel/operational)
@@ -19,7 +20,8 @@ import "../assets/components/MonthlyStats.css";
  * @param {function} onMonthChange - Callback для зміни місяця
  */
 const MonthlyStats = ({
-  days,
+  days = [],
+  entries = [],
   currentBalance,
   initialBalance = 0,
   type,
@@ -31,52 +33,68 @@ const MonthlyStats = ({
     const selectedMonthValue = selectedMonth.getMonth();
     const selectedYear = selectedMonth.getFullYear();
 
-    // Фільтруємо дні за вибраний місяць
-    const monthDays = days.filter((day) => {
-      const dayDate = day.dateString
-        ? new Date(day.dateString)
-        : day.date?.toDate
-          ? day.date.toDate()
-          : new Date(day.date);
+    if (type === "operational") {
+      // Для operational використовуємо entries
+      const monthEntries = entries.filter((entry) => {
+        const entryDate = new Date(entry.date);
+        return (
+          entryDate.getMonth() === selectedMonthValue &&
+          entryDate.getFullYear() === selectedYear
+        );
+      });
 
-      return (
-        dayDate.getMonth() === selectedMonthValue &&
-        dayDate.getFullYear() === selectedYear
-      );
-    });
+      const totalIncome = monthEntries
+        .filter((e) => !e.isWithdrawal)
+        .reduce((sum, entry) => sum + entry.amount, 0);
 
-    // Підраховуємо доходи
-    const totalIncome = monthDays.reduce((sum, day) => {
-      const dayTotal = day.entries?.reduce((acc, e) => acc + e.amount, 0) || 0;
-      return sum + dayTotal;
-    }, 0);
+      const totalWithdrawals = monthEntries
+        .filter((e) => e.isWithdrawal)
+        .reduce((sum, entry) => sum + entry.amount, 0);
 
-    // Підраховуємо витрати
-    let totalExpenses = 0;
-    if (type === "personnel") {
-      totalExpenses = monthDays.reduce((sum, day) => {
+      return {
+        totalIncome,
+        totalExpenses: totalWithdrawals,
+        netProfit: totalIncome - totalWithdrawals,
+        daysCount: monthEntries.length,
+      };
+    } else {
+      // Для personnel використовуємо days
+      const monthDays = days.filter((day) => {
+        const dayDate = day.dateString
+          ? new Date(day.dateString)
+          : day.date?.toDate
+            ? day.date.toDate()
+            : new Date(day.date);
+
+        return (
+          dayDate.getMonth() === selectedMonthValue &&
+          dayDate.getFullYear() === selectedYear
+        );
+      });
+
+      const totalIncome = monthDays.reduce((sum, day) => {
+        const dayTotal =
+          day.entries?.reduce((acc, e) => acc + e.amount, 0) || 0;
+        return sum + dayTotal;
+      }, 0);
+
+      const totalExpenses = monthDays.reduce((sum, day) => {
         const personnelTotal =
           day.personnelEntries?.reduce((acc, e) => acc + e.amount, 0) || 0;
         return sum + personnelTotal;
       }, 0);
-    } else {
-      totalExpenses = monthDays.reduce((sum, day) => {
-        const withdrawalTotal =
-          day.withdrawals?.reduce((acc, w) => acc + w.amount, 0) || 0;
-        return sum + withdrawalTotal;
-      }, 0);
+
+      const netProfit = totalIncome - totalExpenses;
+      const daysCount = monthDays.length;
+
+      return {
+        totalIncome,
+        totalExpenses,
+        netProfit,
+        daysCount,
+      };
     }
-
-    const netProfit = totalIncome - totalExpenses;
-    const daysCount = monthDays.length;
-
-    return {
-      totalIncome,
-      totalExpenses,
-      netProfit,
-      daysCount,
-    };
-  }, [days, type, selectedMonth]);
+  }, [days, entries, type, selectedMonth]);
 
   // Назва місяця
   const monthName = selectedMonth.toLocaleDateString("uk-UA", {

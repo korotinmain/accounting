@@ -2,7 +2,8 @@
 
 export const COLLECTIONS = {
   SETTINGS: "settings",
-  DAYS: "days",
+  PERSONNEL: "personnel",
+  OPERATIONAL: "operational",
 };
 
 export const SWAL_CONFIG = {

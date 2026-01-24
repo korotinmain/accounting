@@ -1,6 +1,7 @@
 import React from "react";
 import PersonIcon from "@mui/icons-material/Person";
 import DeleteIcon from "@mui/icons-material/Delete";
+import InboxIcon from "@mui/icons-material/Inbox";
 import { formatCurrency } from "../utils/formatters";
 import StyledButton from "./StyledButton";
 import "../assets/components/EntriesTable.css";
@@ -13,6 +14,7 @@ import "../assets/components/EntriesTable.css";
  * @param {function} onDelete - Callback для видалення запису
  * @param {function} onEditPersonnel - Callback для редагування запису персоналу
  * @param {function} onDeletePersonnel - Callback для видалення запису персоналу
+ * @param {boolean} isOperational - Чи це operational таб
  */
 const EntriesTable = ({
   entries,
@@ -21,6 +23,7 @@ const EntriesTable = ({
   onDelete,
   onEditPersonnel,
   onDeletePersonnel,
+  isOperational = false,
 }) => {
   if (
     (!entries || entries.length === 0) &&
@@ -28,7 +31,13 @@ const EntriesTable = ({
   ) {
     return (
       <div className="entries-table-empty">
-        <p>Немає записів за цей місяць</p>
+        <div className="empty-icon">
+          <InboxIcon />
+        </div>
+        <p className="empty-title">Немає записів за цей місяць</p>
+        <p className="empty-subtitle">
+          Додайте перший запис, щоб побачити статистику
+        </p>
       </div>
     );
   }
@@ -49,10 +58,12 @@ const EntriesTable = ({
 
   return (
     <div className="entries-table-container">
-      {/* Таблиця загальних надходжень */}
+      {/* Таблиця загальних надходжень / Поклали */}
       {entries && entries.length > 0 && (
         <>
-          <h3 className="table-section-title">Загальне</h3>
+          <h3 className="table-section-title">
+            {isOperational ? "Поклали" : "Загальне"}
+          </h3>
           <table className="entries-table">
             <thead>
               <tr>
@@ -121,11 +132,11 @@ const EntriesTable = ({
         </>
       )}
 
-      {/* Таблиця витрат на персонал */}
+      {/* Таблиця витрат на персонал / Зняли */}
       {personnelEntries && personnelEntries.length > 0 && (
         <>
           <h3 className="table-section-title personnel-section-title">
-            Персонал
+            {isOperational ? "Зняли" : "Персонал"}
           </h3>
           <table className="entries-table personnel-table">
             <thead>

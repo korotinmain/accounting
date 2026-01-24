@@ -6,12 +6,12 @@ import Swal from "sweetalert2";
 // Hooks
 import { useBalance } from "../hooks/useBalance";
 import { useDays } from "../hooks/useDays";
+import { useOperationalEntries } from "../hooks/useOperationalEntries";
 
 // Components
 import Header from "../components/Header";
 import TabSwitcher from "../components/TabSwitcher";
 import MonthlyStats from "../components/MonthlyStats";
-import DayCard from "../components/DayCard";
 import EntryModal from "../components/EntryModal";
 import PersonnelModal from "../components/PersonnelModal";
 import LoadingState from "../components/LoadingState";
@@ -36,6 +36,7 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   const [editingEntry, setEditingEntry] = useState(null);
   const [editingPersonnel, setEditingPersonnel] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [isWithdrawalMode, setIsWithdrawalMode] = useState(false);
 
   // Hooks для personnel
   const personnelBalance = useBalance("personnel");
@@ -43,119 +44,126 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
 
   // Hooks для operational
   const operationalBalance = useBalance("operational");
-  const operationalDays = useDays("operational");
+  const operationalEntries = useOperationalEntries();
 
   // Вибираємо активні дані на основі табу
   const activeBalance =
     activeTab === "personnel" ? personnelBalance : operationalBalance;
-  const activeDays =
-    activeTab === "personnel" ? personnelDays : operationalDays;
 
-  // Фільтруємо записи по вибраному місяцю для Personnel
+  // Фільтруємо записи по вибраному місяцю
   const filteredData = useMemo(() => {
-    if (activeTab !== "personnel")
-      return { entries: [], personnelEntries: [], days: [] };
-
     const selectedMonthValue = selectedMonth.getMonth();
     const selectedYear = selectedMonth.getFullYear();
 
-    const daysForMonth = personnelDays.days.filter((day) => {
-      const dayDate = day.dateString
-        ? new Date(day.dateString)
-        : day.date?.toDate
-          ? day.date.toDate()
-          : new Date(day.date);
-      return (
-        dayDate.getMonth() === selectedMonthValue &&
-        dayDate.getFullYear() === selectedYear
-      );
-    });
+    if (activeTab === "personnel") {
+      const daysForMonth = personnelDays.days.filter((day) => {
+        const dayDate = day.dateString
+          ? new Date(day.dateString)
+          : day.date?.toDate
+            ? day.date.toDate()
+            : new Date(day.date);
+        return (
+          dayDate.getMonth() === selectedMonthValue &&
+          dayDate.getFullYear() === selectedYear
+        );
+      });
 
-    // Збираємо всі записи загальні з інформацією про дату
-    const allEntries = daysForMonth.reduce((acc, day) => {
-      const dayDate = day.dateString
-        ? new Date(day.dateString)
-        : day.date?.toDate
-          ? day.date.toDate()
-          : new Date(day.date);
+      // Збираємо всі записи загальні з інформацією про дату
+      const allEntries = daysForMonth.reduce((acc, day) => {
+        const dayDate = day.dateString
+          ? new Date(day.dateString)
+          : day.date?.toDate
+            ? day.date.toDate()
+            : new Date(day.date);
 
-      const entriesWithDate = (day.entries || []).map((entry) => ({
-        ...entry,
-        date: dayDate,
-        dayId: day.id,
-      }));
-      return [...acc, ...entriesWithDate];
-    }, []);
-
-    // Збираємо всі записи персоналу з інформацією про дату
-    const allPersonnelEntries = daysForMonth.reduce((acc, day) => {
-      const dayDate = day.dateString
-        ? new Date(day.dateString)
-        : day.date?.toDate
-          ? day.date.toDate()
-          : new Date(day.date);
-
-      const personnelEntriesWithDate = (day.personnelEntries || []).map(
-        (entry) => ({
+        const entriesWithDate = (day.entries || []).map((entry) => ({
           ...entry,
           date: dayDate,
           dayId: day.id,
-        }),
-      );
-      return [...acc, ...personnelEntriesWithDate];
-    }, []);
+        }));
+        return [...acc, ...entriesWithDate];
+      }, []);
 
-    return {
-      entries: allEntries,
-      personnelEntries: allPersonnelEntries,
-      days: daysForMonth,
-    };
-  }, [activeTab, personnelDays.days, selectedMonth]);
+      // Збираємо всі записи персоналу з інформацією про дату
+      const allPersonnelEntries = daysForMonth.reduce((acc, day) => {
+        const dayDate = day.dateString
+          ? new Date(day.dateString)
+          : day.date?.toDate
+            ? day.date.toDate()
+            : new Date(day.date);
+
+        const personnelEntriesWithDate = (day.personnelEntries || []).map(
+          (entry) => ({
+            ...entry,
+            date: dayDate,
+            dayId: day.id,
+          }),
+        );
+        return [...acc, ...personnelEntriesWithDate];
+      }, []);
+
+      return {
+        entries: allEntries,
+        personnelEntries: allPersonnelEntries,
+        days: daysForMonth,
+      };
+    } else {
+      // Для operational фільтруємо записи за місяцем та розділяємо на надходження та зняття
+      const filteredEntries = operationalEntries.entries.filter((entry) => {
+        const entryDate = new Date(entry.date);
+        return (
+          entryDate.getMonth() === selectedMonthValue &&
+          entryDate.getFullYear() === selectedYear
+        );
+      });
+
+      const deposits = filteredEntries.filter((e) => !e.isWithdrawal);
+      const withdrawals = filteredEntries.filter((e) => e.isWithdrawal);
+
+      return {
+        entries: deposits,
+        personnelEntries: withdrawals, // Використовуємо personnelEntries для зняттів
+        days: [],
+      };
+    }
+  }, [
+    activeTab,
+    personnelDays.days,
+    operationalEntries.entries,
+    selectedMonth,
+  ]);
 
   // Обчислення поточного балансу
   const currentBalance = useMemo(() => {
-    let balance = activeBalance.initialBalance;
+    if (activeTab === "operational") {
+      // Для operational: початковий баланс + надходження - зняття
+      const deposits = operationalEntries.entries
+        .filter((e) => !e.isWithdrawal)
+        .reduce((sum, entry) => sum + entry.amount, 0);
+      const withdrawals = operationalEntries.entries
+        .filter((e) => e.isWithdrawal)
+        .reduce((sum, entry) => sum + entry.amount, 0);
+      return activeBalance.initialBalance + deposits - withdrawals;
+    } else {
+      // Для personnel: початковий баланс + загальні надходження - витрати на персонал
+      let balance = activeBalance.initialBalance;
 
-    activeDays.days.forEach((day) => {
-      const dayTotal = day.entries?.reduce((sum, e) => sum + e.amount, 0) || 0;
-
-      if (activeTab === "operational") {
-        const withdrawalTotal =
-          day.withdrawals?.reduce((sum, w) => sum + w.amount, 0) || 0;
-        balance += dayTotal - withdrawalTotal;
-      } else {
-        // Витрати на персонал (віднімаємо)
+      personnelDays.days.forEach((day) => {
+        const dayTotal =
+          day.entries?.reduce((sum, e) => sum + e.amount, 0) || 0;
         const personnelTotal =
           day.personnelEntries?.reduce((sum, e) => sum + e.amount, 0) || 0;
-        // Загальні надходження (додаємо)
         balance += dayTotal - personnelTotal;
-      }
-    });
+      });
 
-    return balance;
-  }, [activeBalance.initialBalance, activeDays.days, activeTab]);
-
-  // Обчислення загальних витрат на персонал та загальне
-  const { totalPersonnelExpenses, totalGeneralExpenses } = useMemo(() => {
-    if (activeTab !== "personnel") {
-      return { totalPersonnelExpenses: 0, totalGeneralExpenses: 0 };
+      return balance;
     }
-
-    let personnel = 0;
-    let general = 0;
-
-    personnelDays.days.forEach((day) => {
-      const personnelTotal =
-        day.personnelEntries?.reduce((sum, e) => sum + e.amount, 0) || 0;
-      const generalTotal =
-        day.entries?.reduce((sum, e) => sum + e.amount, 0) || 0;
-
-      personnel += personnelTotal;
-      general += generalTotal;
-    });
-
-    return { totalPersonnelExpenses: personnel, totalGeneralExpenses: general };
-  }, [activeTab, personnelDays.days]);
+  }, [
+    activeTab,
+    operationalEntries.entries,
+    personnelDays.days,
+    activeBalance.initialBalance,
+  ]);
 
   // Обробник виходу
   const handleLogout = useCallback(() => {
@@ -172,14 +180,17 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
     setActiveTab(tab);
   }, []);
 
-  const handleOpenModal = useCallback((entry = null) => {
+  const handleOpenModal = useCallback((entry = null, isWithdrawal = false) => {
     setEditingEntry(entry);
+    // Якщо редагуємо запис, беремо isWithdrawal з запису, інакше з параметра
+    setIsWithdrawalMode(entry ? entry.isWithdrawal || false : isWithdrawal);
     setShowModal(true);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setShowModal(false);
     setEditingEntry(null);
+    setIsWithdrawalMode(false);
   }, []);
 
   const handleOpenPersonnelModal = useCallback((personnel = null) => {
@@ -208,36 +219,52 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
       if (!result.isConfirmed) return;
 
       try {
-        const selectedMonthValue = selectedMonth.getMonth();
-        const selectedYear = selectedMonth.getFullYear();
+        if (activeTab === "operational") {
+          // Для operational просто видаляємо запис
+          await operationalEntries.deleteEntry(entryId);
+          await operationalBalance.loadBalance();
+        } else {
+          // Для personnel
+          const selectedMonthValue = selectedMonth.getMonth();
+          const selectedYear = selectedMonth.getFullYear();
 
-        const daysForMonth = personnelDays.days.filter((day) => {
-          const dayDate = day.dateString
-            ? new Date(day.dateString)
-            : day.date?.toDate
-              ? day.date.toDate()
-              : new Date(day.date);
-          return (
-            dayDate.getMonth() === selectedMonthValue &&
-            dayDate.getFullYear() === selectedYear
-          );
-        });
+          const daysForMonth = personnelDays.days.filter((day) => {
+            const dayDate = day.dateString
+              ? new Date(day.dateString)
+              : day.date?.toDate
+                ? day.date.toDate()
+                : new Date(day.date);
+            return (
+              dayDate.getMonth() === selectedMonthValue &&
+              dayDate.getFullYear() === selectedYear
+            );
+          });
 
-        for (const day of daysForMonth) {
-          const entryToDelete = day.entries.find((e) => e.id === entryId);
-          if (entryToDelete) {
-            const updatedEntries = day.entries.filter((e) => e.id !== entryId);
-            // Перевіряємо, чи є ще записи персоналу
-            if (updatedEntries.length === 0 && !day.personnelEntries?.length) {
-              await personnelDays.deleteDay(day.id);
-            } else {
-              await personnelDays.updateDay(day.id, {
-                ...day,
-                entries: updatedEntries,
-              });
+          for (const day of daysForMonth) {
+            const entryToDelete = day.entries.find((e) => e.id === entryId);
+            if (entryToDelete) {
+              const updatedEntries = day.entries.filter(
+                (e) => e.id !== entryId,
+              );
+              if (
+                updatedEntries.length === 0 &&
+                !day.personnelEntries?.length
+              ) {
+                await personnelDays.deleteDay(day.id);
+              } else {
+                await personnelDays.updateDay(day.id, {
+                  ...day,
+                  entries: updatedEntries,
+                });
+              }
+              break;
             }
-            break;
           }
+
+          await Promise.all([
+            personnelBalance.loadBalance(),
+            personnelDays.loadDays(true),
+          ]);
         }
 
         Swal.fire({
@@ -246,11 +273,6 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
           showConfirmButton: false,
           timer: 1500,
         });
-
-        await Promise.all([
-          personnelBalance.loadBalance(),
-          personnelDays.loadDays(true),
-        ]);
       } catch (error) {
         console.error("Помилка видалення запису:", error);
         Swal.fire({
@@ -261,7 +283,14 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         });
       }
     },
-    [personnelDays, personnelBalance, selectedMonth],
+    [
+      activeTab,
+      operationalEntries,
+      operationalBalance,
+      personnelDays,
+      personnelBalance,
+      selectedMonth,
+    ],
   );
 
   const handleDeletePersonnelEntry = useCallback(
@@ -342,7 +371,6 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
 
   const handleEditEntry = useCallback(
     async (entryId) => {
-      // Знаходимо запис в filteredData
       const entryToEdit = filteredData.entries.find((e) => e.id === entryId);
 
       if (!entryToEdit) {
@@ -350,7 +378,6 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         return;
       }
 
-      // Відкриваємо модалку з даними для редагування
       handleOpenModal(entryToEdit);
     },
     [filteredData.entries, handleOpenModal],
@@ -368,10 +395,20 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         return;
       }
 
-      // Відкриваємо модалку з даними для редагування
-      handleOpenPersonnelModal(personnelToEdit);
+      // Для операційної таби використовуємо handleOpenModal (для withdrawals)
+      if (activeTab === "operational") {
+        handleOpenModal(personnelToEdit, true); // true = isWithdrawal
+      } else {
+        // Для personnel таби використовуємо handleOpenPersonnelModal
+        handleOpenPersonnelModal(personnelToEdit);
+      }
     },
-    [filteredData.personnelEntries, handleOpenPersonnelModal],
+    [
+      filteredData.personnelEntries,
+      activeTab,
+      handleOpenModal,
+      handleOpenPersonnelModal,
+    ],
   );
 
   const handleSavePersonnel = useCallback(
@@ -470,67 +507,98 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
   const handleSaveEntry = useCallback(
     async (entryData) => {
       try {
-        // Якщо редагуємо існуючий entry
-        if (entryData.id && entryData.dayId) {
-          const day = personnelDays.days.find((d) => d.id === entryData.dayId);
-          if (day) {
-            const updatedEntries = day.entries.map((e) =>
-              e.id === entryData.id
-                ? { ...e, name: entryData.name, amount: entryData.amount }
-                : e,
-            );
-            await personnelDays.updateDay(day.id, {
-              ...day,
-              entries: updatedEntries,
-            });
-          }
-        } else {
-          // Створюємо новий entry
-          const existingDay = personnelDays.days.find((day) => {
-            const dayDate =
-              day.dateString ||
-              (day.date?.toDate
-                ? day.date.toDate().toISOString().split("T")[0]
-                : new Date(day.date).toISOString().split("T")[0]);
-            return dayDate === entryData.date;
-          });
-
-          if (existingDay) {
-            // Додаємо entry до існуючого дня з унікальним ID
-            const newEntryId = `${existingDay.id}-entry-${(existingDay.entries || []).length}`;
-            const updatedEntries = [
-              ...(existingDay.entries || []),
-              {
-                id: newEntryId,
-                name: entryData.name,
-                amount: entryData.amount,
-              },
-            ];
-            await personnelDays.updateDay(existingDay.id, {
-              ...existingDay,
-              entries: updatedEntries,
+        if (activeTab === "operational") {
+          // Логіка для operational
+          if (entryData.id) {
+            // Редагування
+            await operationalEntries.updateEntry(entryData.id, {
+              name: entryData.name,
+              amount: entryData.amount,
+              date: entryData.date,
+              isWithdrawal: entryData.isWithdrawal || false,
             });
           } else {
-            // Створюємо новий день з entry (ID буде додано після створення дня)
-            await personnelDays.createDay({
-              dateString: entryData.date,
-              entries: [{ name: entryData.name, amount: entryData.amount }],
-              personnelEntries: [],
+            // Створення
+            await operationalEntries.createEntry({
+              name: entryData.name,
+              amount: entryData.amount,
+              date: entryData.date,
+              isWithdrawal: entryData.isWithdrawal || false,
             });
           }
+
+          Swal.fire({
+            icon: "success",
+            title: entryData.id ? "Запис оновлено" : "Запис додано",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+
+          await operationalBalance.loadBalance();
+        } else {
+          // Логіка для personnel
+          if (entryData.id && entryData.dayId) {
+            const day = personnelDays.days.find(
+              (d) => d.id === entryData.dayId,
+            );
+            if (day) {
+              const updatedEntries = day.entries.map((e) =>
+                e.id === entryData.id
+                  ? { ...e, name: entryData.name, amount: entryData.amount }
+                  : e,
+              );
+              await personnelDays.updateDay(day.id, {
+                ...day,
+                entries: updatedEntries,
+              });
+            }
+          } else {
+            // Створюємо новий entry
+            const existingDay = personnelDays.days.find((day) => {
+              const dayDate =
+                day.dateString ||
+                (day.date?.toDate
+                  ? day.date.toDate().toISOString().split("T")[0]
+                  : new Date(day.date).toISOString().split("T")[0]);
+              return dayDate === entryData.date;
+            });
+
+            if (existingDay) {
+              const newEntryId = `${existingDay.id}-entry-${(existingDay.entries || []).length}`;
+              const updatedEntries = [
+                ...(existingDay.entries || []),
+                {
+                  id: newEntryId,
+                  name: entryData.name,
+                  amount: entryData.amount,
+                },
+              ];
+              await personnelDays.updateDay(existingDay.id, {
+                ...existingDay,
+                entries: updatedEntries,
+              });
+            } else {
+              await personnelDays.createDay({
+                dateString: entryData.date,
+                entries: [{ name: entryData.name, amount: entryData.amount }],
+                personnelEntries: [],
+              });
+            }
+          }
+
+          Swal.fire({
+            icon: "success",
+            title: entryData.id ? "Запис оновлено" : "Запис додано",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+
+          await Promise.all([
+            personnelBalance.loadBalance(),
+            personnelDays.loadDays(true),
+          ]);
         }
 
-        Swal.fire({
-          icon: "success",
-          title: entryData.id ? "Запис оновлено" : "Запис додано",
-          showConfirmButton: false,
-          timer: 1500,
-        });
-
-        await Promise.all([
-          personnelBalance.loadBalance(),
-          personnelDays.loadDays(true),
-        ]);
         handleCloseModal();
       } catch (error) {
         console.error("Помилка збереження:", error);
@@ -542,24 +610,46 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         });
       }
     },
-    [personnelDays, personnelBalance, handleCloseModal],
+    [
+      activeTab,
+      operationalEntries,
+      operationalBalance,
+      personnelDays,
+      personnelBalance,
+      handleCloseModal,
+    ],
   );
 
   // Loading state
-  if (activeDays.loading) {
+  const isLoading =
+    activeTab === "personnel"
+      ? personnelDays.loading
+      : operationalEntries.loading;
+  const hasError =
+    activeTab === "personnel"
+      ? personnelDays.error && personnelDays.days.length === 0
+      : operationalEntries.error && operationalEntries.entries.length === 0;
+  const errorMessage =
+    activeTab === "personnel" ? personnelDays.error : operationalEntries.error;
+
+  if (isLoading) {
     return <LoadingState />;
   }
 
   // Error state
-  if (activeDays.error && activeDays.days.length === 0) {
+  if (hasError) {
     return (
       <div className="app-container">
         <div className="error-state">
           <h2>😔 Не вдалося завантажити дані</h2>
-          <p>{activeDays.error}</p>
+          <p>{errorMessage}</p>
           <button
             className="btn btn-primary"
-            onClick={() => activeDays.loadDays()}
+            onClick={() =>
+              activeTab === "personnel"
+                ? personnelDays.loadDays()
+                : operationalEntries.loadEntries()
+            }
           >
             Спробувати знову
           </button>
@@ -580,7 +670,10 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
 
       <div className="stats-and-actions-container">
         <MonthlyStats
-          days={activeDays.days}
+          days={activeTab === "personnel" ? personnelDays.days : []}
+          entries={
+            activeTab === "operational" ? operationalEntries.entries : []
+          }
           currentBalance={currentBalance}
           initialBalance={activeBalance.initialBalance}
           type={activeTab}
@@ -610,57 +703,38 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         </div>
       )}
 
-      {activeTab === "personnel" ? (
-        <div className="personnel-section">
-          <EntriesTable
-            entries={filteredData.entries}
-            personnelEntries={filteredData.personnelEntries}
-            onEdit={handleEditEntry}
-            onDelete={handleDeleteEntry}
-            onEditPersonnel={handleEditPersonnelEntry}
-            onDeletePersonnel={handleDeletePersonnelEntry}
-          />
-        </div>
-      ) : (
-        <div className="days-section">
+      {activeTab === "operational" && (
+        <div className="action-buttons-container">
           <StyledButton
             variant="primary"
-            size="large"
+            size="medium"
             startIcon={<AddIcon />}
-            onClick={() => handleOpenModal()}
+            onClick={() => handleOpenModal(null, false)}
           >
-            Додати новий день
+            Покласти
           </StyledButton>
-          <h3 className="section-title">Всі записи</h3>
-          {activeDays.days.length === 0 ? (
-            <div className="empty-state">
-              <p>Немає записів</p>
-            </div>
-          ) : (
-            <div className="days-grid">
-              {[...activeDays.days]
-                .sort((a, b) => {
-                  const dateA = a.date?.toDate
-                    ? a.date.toDate()
-                    : new Date(a.date);
-                  const dateB = b.date?.toDate
-                    ? b.date.toDate()
-                    : new Date(b.date);
-                  return dateB - dateA;
-                })
-                .map((day) => (
-                  <DayCard
-                    key={day.id}
-                    day={day}
-                    activeTab={activeTab}
-                    onEdit={handleOpenModal}
-                    onDelete={activeDays.deleteDay}
-                  />
-                ))}
-            </div>
-          )}
+          <StyledButton
+            variant="secondary"
+            size="medium"
+            startIcon={<AddIcon />}
+            onClick={() => handleOpenModal(null, true)}
+          >
+            Зняти
+          </StyledButton>
         </div>
       )}
+
+      <div className="personnel-section">
+        <EntriesTable
+          entries={filteredData.entries}
+          personnelEntries={filteredData.personnelEntries}
+          onEdit={handleEditEntry}
+          onDelete={handleDeleteEntry}
+          onEditPersonnel={handleEditPersonnelEntry}
+          onDeletePersonnel={handleDeletePersonnelEntry}
+          isOperational={activeTab === "operational"}
+        />
+      </div>
 
       <EntryModal
         isOpen={showModal}
@@ -668,6 +742,8 @@ const MainPage = ({ selectedDoctor, onLogout }) => {
         onSave={handleSaveEntry}
         editingEntry={editingEntry}
         doctorName={selectedDoctor}
+        isWithdrawal={isWithdrawalMode}
+        isOperational={activeTab === "operational"}
       />
 
       <PersonnelModal

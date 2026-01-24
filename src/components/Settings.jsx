@@ -4,7 +4,6 @@ import SaveIcon from "@mui/icons-material/Save";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
-import { formatCurrency } from "../utils/formatters";
 import { useSettings } from "../hooks/useSettings";
 import StyledButton from "./StyledButton";
 import { FormInput, IconWithLabel } from "./common";
